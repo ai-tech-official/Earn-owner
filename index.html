@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin Panel</title>
+<script>(function(){try{var t=localStorage.getItem('ewi_admin_theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}})()</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js" crossorigin="anonymous"></script>
+<style>
+:root{--brand:#6c5ce7;--brand2:#00c2ff;--accent:#ff4d8d;--gold:#ffc83d;--ok:#12b886;--warn:#f59f00;--bad:#f03e3e;
+--bg:#f3f4fb;--card:#ffffff;--text:#161a3a;--muted:#6b7099;--line:#e6e8f5;--soft:#f6f7fd;--shadow:0 6px 24px rgba(40,44,110,.08);
+--grad:linear-gradient(135deg,var(--brand),var(--brand2) 60%,var(--accent));--side:268px}
+html[data-theme=dark]{--bg:#0c0e24;--card:#161a3d;--text:#eef0ff;--muted:#9aa0d0;--line:#252a55;--soft:#1b2048;--shadow:0 6px 24px rgba(0,0,0,.35)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:Inter,'Hind Siliguri',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45;transition:background .3s,color .3s}
+[hidden]{display:none!important}
+.material-icons-round{font-size:20px;vertical-align:middle;line-height:1;user-select:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+a{color:var(--brand)}
+h1,h2,h3,h4{font-weight:700;letter-spacing:-.01em}
+small,.muted{color:var(--muted)}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+
+/* boot + auth */
+.boot{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:90}
+.spin{width:42px;height:42px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--brand);animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.auth{min-height:100%;display:grid;place-items:center;padding:20px;background:radial-gradient(900px 500px at 10% 0,rgba(108,92,231,.35),transparent),radial-gradient(800px 500px at 100% 100%,rgba(255,77,141,.28),transparent),var(--bg)}
+.auth-card{width:100%;max-width:410px;background:var(--card);border-radius:26px;padding:30px 26px;box-shadow:0 20px 60px rgba(30,30,90,.25);border:1px solid var(--line);animation:rise .5s both}
+.logo{width:66px;height:66px;border-radius:20px;background:var(--grad);display:grid;place-items:center;color:#fff;margin:0 auto 14px;box-shadow:0 10px 28px rgba(108,92,231,.45)}
+.logo .material-icons-round{font-size:34px}
+.auth-card h2{text-align:center;font-size:22px}.auth-card>p{text-align:center;color:var(--muted);margin:4px 0 20px}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.note{display:flex;gap:10px;padding:11px 13px;border-radius:13px;font-size:12.5px;background:rgba(245,159,0,.12);color:var(--text);border:1px solid rgba(245,159,0,.35);margin-bottom:14px}
+.note.info{background:rgba(108,92,231,.1);border-color:rgba(108,92,231,.3)}
+.note.bad{background:rgba(240,62,62,.1);border-color:rgba(240,62,62,.35)}
+.note .material-icons-round{flex:none;color:var(--warn)}.note.info .material-icons-round{color:var(--brand)}.note.bad .material-icons-round{color:var(--bad)}
+
+/* shell */
+.app{display:flex;min-height:100%}
+.side{width:var(--side);flex:none;position:fixed;inset:0 auto 0 0;background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:40;transition:transform .3s}
+.brand{display:flex;align-items:center;gap:11px;padding:18px 18px 12px}
+.brand .logo{width:42px;height:42px;border-radius:13px;margin:0;box-shadow:0 6px 16px rgba(108,92,231,.4)}.brand .logo .material-icons-round{font-size:23px}
+.brand b{display:block;font-size:15px;line-height:1.15}.brand small{font-size:11.5px}
+.nav{flex:1;overflow:auto;padding:4px 12px 12px}
+.nav h6{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:16px 8px 6px;font-weight:700}
+.nav a{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:12px;color:var(--text);text-decoration:none;font-weight:500;transition:background .2s,color .2s;margin-bottom:2px}
+.nav a .material-icons-round{color:var(--muted);transition:color .2s}
+.nav a:hover{background:var(--soft)}
+.nav a.on{background:var(--grad);color:#fff;box-shadow:0 8px 20px rgba(108,92,231,.35)}.nav a.on .material-icons-round{color:#fff}
+.nav a .bdg{margin-left:auto;background:var(--accent);color:#fff;border-radius:99px;font-size:11px;font-weight:700;padding:1px 7px;min-width:20px;text-align:center}
+.side-foot{padding:12px;border-top:1px solid var(--line)}
+.me{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;background:var(--soft)}
+.me .av,#meAv{width:40px!important;height:40px!important;min-width:40px!important;max-width:40px!important;min-height:40px!important;max-height:40px!important;flex:0 0 40px!important;aspect-ratio:1/1;border-radius:50%!important;align-self:center;overflow:hidden}.me div{min-width:0;flex:1}.me b{display:block;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.me small{font-size:11px}
+.main{flex:1;margin-left:var(--side);min-width:0}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:12px 22px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top h1{font-size:19px}.grow{flex:1}
+.icon-btn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);transition:.2s}
+.icon-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+#menuBtn{display:none}
+.live{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);padding:6px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--bad)}.live.on i{background:var(--ok);box-shadow:0 0 0 0 rgba(18,184,134,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(18,184,134,0)}100%{box-shadow:0 0 0 0 rgba(18,184,134,0)}}
+.view{padding:22px;max-width:1280px;margin:0 auto;animation:rise .35s both}
+.scrim{position:fixed;inset:0;background:rgba(10,12,40,.55);z-index:35;opacity:0;pointer-events:none;transition:.3s}
+/* anti-glitch: own GPU layers, no backdrop blur on mobile */
+.side{will-change:transform;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.nav{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;transform:translateZ(0)}
+.scrim{will-change:opacity}
+@media(max-width:899px){.top{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--bg)}.shw{-webkit-backdrop-filter:none;backdrop-filter:none}}
+@media(max-width:899px){.side{transform:translateX(-100%)}.side.open{transform:none;box-shadow:0 0 60px rgba(0,0,0,.4)}.scrim.on{opacity:1;pointer-events:auto}.main{margin-left:0}#menuBtn{display:grid}.top{padding:10px 14px}.view{padding:14px}.live span{display:none}.live{padding:8px}}
+
+/* basics */
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:18px}
+.block{margin-bottom:18px}
+.blk-h{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;margin-bottom:14px}
+.blk-h h3{font-size:16px;display:flex;align-items:center;gap:8px}.blk-h h3 .material-icons-round{color:var(--brand)}
+.blk-h p{color:var(--muted);font-size:12.5px;margin-top:2px}
+.blk-a{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:13px;font-weight:600;background:var(--grad);color:#fff;box-shadow:0 8px 20px rgba(108,92,231,.3);transition:.2s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.06)}.btn:active{transform:none}
+.btn[disabled]{opacity:.55;pointer-events:none}
+.btn.ghost{background:var(--soft);color:var(--text);box-shadow:none;border:1px solid var(--line)}
+.btn.ok{background:linear-gradient(135deg,#12b886,#38d9a9);box-shadow:0 8px 20px rgba(18,184,134,.3)}
+.btn.danger{background:linear-gradient(135deg,#f03e3e,#ff6b6b);box-shadow:0 8px 20px rgba(240,62,62,.28)}
+.btn.sm{padding:6px 11px;font-size:12.5px;border-radius:10px}.btn.full{width:100%}
+.in,.fld input[type=text],.fld input[type=number],.fld input[type=url],.fld input[type=password],.fld input[type=email],.fld select,.fld textarea,.search input,.flt select,.flt input{width:100%;padding:10px 13px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);color:var(--text);font:inherit;outline:0;transition:.2s}
+.in:focus,.fld input:focus,.fld select:focus,.fld textarea:focus,.search input:focus,.flt select:focus,.flt input:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(108,92,231,.14);background:var(--card)}
+.fld textarea{resize:vertical;min-height:84px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+.fld.err input,.fld.err textarea,.fld.err select{border-color:var(--bad)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}.fld{grid-column:1/-1}.fld.half{grid-column:span 1}
+@media(max-width:560px){.fld.half{grid-column:1/-1}}
+.fld>label{display:block;font-weight:600;font-size:12.5px;margin-bottom:6px}.fld>label b{color:var(--bad)}
+.fld>small{display:block;margin-top:5px;font-size:11.5px}
+.search{position:relative;min-width:200px}.search input{padding-left:36px}.search .material-icons-round{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:19px}
+.sw{position:relative;display:inline-block;width:46px;height:26px}.sw input{opacity:0;width:0;height:0}.sw i{position:absolute;inset:0;border-radius:99px;background:var(--line);transition:.25s;cursor:pointer}
+.sw i:before{content:'';position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.25s;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.sw input:checked+i{background:var(--ok)}.sw input:checked+i:before{transform:translateX(20px)}
+.swrow{display:flex;align-items:center;gap:12px}.swrow span{color:var(--muted);font-size:12.5px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 6px 5px 11px;border-radius:99px;background:rgba(108,92,231,.12);color:var(--brand);font-weight:600;font-size:12.5px}
+.chip button{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:rgba(108,92,231,.2)}.chip .material-icons-round{font-size:14px}
+.chiprow{display:flex;gap:8px}
+.optrow{display:flex;gap:9px;align-items:center;margin-bottom:8px}.optrow input[type=radio]{accent-color:var(--ok);width:18px;height:18px;flex:none}
+.optrow .tag{font-weight:700;color:var(--muted);width:18px}
+.imgprev{margin-top:8px;border-radius:14px;overflow:hidden;background:var(--soft);border:1px dashed var(--line);display:none;max-height:170px}.imgprev img{display:block;width:100%;max-height:170px;object-fit:contain}.imgprev.on{display:block}
+.crow{display:grid;grid-template-columns:120px 1fr 1.4fr auto;gap:8px;margin-bottom:8px}
+@media(max-width:560px){.crow{grid-template-columns:1fr 1fr}.crow>*:nth-child(3){grid-column:1/-1}}
+.eye{position:relative}.eye button{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--muted)}.eye input{padding-right:42px!important}
+
+/* lists */
+.list{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:13px;padding:12px 6px;border-bottom:1px solid var(--line);transition:background .2s}
+.row:last-child{border-bottom:0}.row.click{cursor:pointer}.row.click:hover{background:var(--soft);border-radius:12px}
+.row .thumb{width:46px;height:46px;border-radius:13px;object-fit:cover;background:var(--soft);display:grid;place-items:center;color:var(--brand);flex:none;overflow:hidden}
+.row .thumb img{width:100%;height:100%;object-fit:cover}
+.row .mid{flex:1;min-width:0}.row .mid b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row .mid small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .acts{display:flex;gap:6px;flex:none}
+.act{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--soft);border:1px solid var(--line);transition:.2s}.act:hover{background:var(--brand);color:#fff;border-color:var(--brand)}.act.del:hover{background:var(--bad);border-color:var(--bad)}
+.empty{text-align:center;color:var(--muted);padding:34px 10px}.empty .material-icons-round{font-size:42px;opacity:.5;display:block;margin:0 auto 6px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:700;background:var(--soft);color:var(--muted);white-space:nowrap}
+.badge.ok{background:rgba(18,184,134,.14);color:var(--ok)}.badge.warn{background:rgba(245,159,0,.16);color:var(--warn)}.badge.bad{background:rgba(240,62,62,.13);color:var(--bad)}.badge.brand{background:rgba(108,92,231,.14);color:var(--brand)}
+.av{width:40px;height:40px;border-radius:50%;background:var(--grad);color:#fff;display:grid;place-items:center;font-weight:700;flex:none;text-transform:uppercase;overflow:hidden}.av img{width:100%;height:100%;object-fit:cover}
+.coin{display:inline-flex;align-items:center;gap:5px;font-weight:700}.coin:before{content:'৳';display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--gold);color:#5b4200;font-size:11px}
+.sk{border-radius:12px;background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));background-size:200% 100%;animation:shim 1.3s infinite;min-height:18px}@keyframes shim{to{background-position:-200% 0}}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{padding:8px 15px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-weight:600;color:var(--muted);transition:.2s}.tab.on{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(108,92,231,.3)}.tab em{font-style:normal;opacity:.8;margin-left:5px;font-size:12px}
+.flt{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}.flt>*{flex:1;min-width:130px}
+.more{display:flex;justify-content:center;gap:10px;align-items:center;margin-top:14px;color:var(--muted)}
+
+/* dashboard */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px}
+.stat{position:relative;overflow:hidden;display:flex;gap:13px;align-items:center}
+.stat .si{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;color:#fff;flex:none}.stat .si .material-icons-round{font-size:25px}
+.stat b{display:block;font-size:22px;line-height:1.1}.stat span{color:var(--muted);font-size:12.5px}.stat small{display:block;font-size:11.5px;margin-top:2px}
+.g1{background:linear-gradient(135deg,#6c5ce7,#a29bfe)}.g2{background:linear-gradient(135deg,#00b4d8,#48cae4)}.g3{background:linear-gradient(135deg,#12b886,#63e6be)}.g4{background:linear-gradient(135deg,#f59f00,#ffd43b)}.g5{background:linear-gradient(135deg,#ff4d8d,#ff8fab)}.g6{background:linear-gradient(135deg,#845ef7,#da77f2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}.grid3{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:18px}
+@media(max-width:1000px){.grid2,.grid3{grid-template-columns:1fr}}
+.chart svg{width:100%;height:auto;display:block}.legend{display:flex;flex-direction:column;gap:9px;margin-top:6px}.legend div{display:flex;align-items:center;gap:8px;font-size:12.5px}.legend i{width:10px;height:10px;border-radius:50%}.legend b{margin-left:auto}
+.donut{display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center}.donut svg{width:150px;height:150px}.donut .legend{flex:1;min-width:130px}
+
+/* users / tx */
+.urow{display:grid;grid-template-columns:minmax(180px,1.6fr) 1fr 1fr 1fr 110px;gap:12px;align-items:center;padding:11px 8px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:12px}
+.urow:hover{background:var(--soft)}.urow.hd{cursor:default;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}.urow.hd:hover{background:none}
+.urow .u{display:flex;align-items:center;gap:11px;min-width:0}.urow .u div{min-width:0}.urow .u b,.urow .u small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:760px){.urow{grid-template-columns:1fr auto}.urow.hd{display:none}.urow>.c2,.urow>.c4,.urow>.c1{display:none}}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:14px 0}.kv div{background:var(--soft);border-radius:14px;padding:11px 13px}.kv small{display:block;font-size:11.5px}.kv b{font-size:16px}
+.dl{display:grid;grid-template-columns:130px 1fr;gap:8px 12px;font-size:13px}.dl dt{color:var(--muted)}.dl dd{word-break:break-word;font-weight:500}
+.pos{color:var(--ok);font-weight:700}.neg{color:var(--bad);font-weight:700}
+
+/* sheet / dialog */
+.shw{position:fixed;inset:0;z-index:70;display:flex;justify-content:flex-end;background:rgba(10,12,40,.55);backdrop-filter:blur(3px);animation:fade .25s both}
+@keyframes fade{from{opacity:0}}
+.sheet{width:min(580px,100%);height:100%;background:var(--bg);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.3);animation:slide .3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes slide{from{transform:translateX(40px);opacity:0}}
+.sheet.wide{width:min(760px,100%)}
+.sh-h{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line);background:var(--card)}.sh-h h3{flex:1;font-size:17px}
+.sh-b{flex:1;overflow:auto;padding:18px}.sh-f{display:flex;gap:10px;justify-content:flex-end;padding:13px 18px;border-top:1px solid var(--line);background:var(--card);flex-wrap:wrap}
+@media(max-width:700px){.shw{align-items:flex-end}.sheet,.sheet.wide{width:100%;height:auto;max-height:93vh;border-radius:24px 24px 0 0;animation:up .3s both}@keyframes up{from{transform:translateY(40px);opacity:0}}}
+.dlg{margin:auto;width:min(420px,calc(100% - 28px));background:var(--card);border-radius:22px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.4);animation:rise .25s both;align-self:center}
+.shw.c{justify-content:center;align-items:center}.dlg h3{margin-bottom:6px}.dlg p{color:var(--muted);margin-bottom:14px;white-space:pre-line}.dlg .btns{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+#toasts{position:fixed;right:16px;bottom:16px;z-index:99;display:flex;flex-direction:column;gap:9px;max-width:calc(100% - 32px)}
+.toast{display:flex;align-items:center;gap:9px;padding:12px 16px;border-radius:14px;background:#1c2050;color:#fff;box-shadow:0 12px 34px rgba(0,0,0,.35);animation:rise .3s both;font-weight:500}
+.toast.ok .material-icons-round{color:#38d9a9}.toast.bad{background:#a51d2d}.toast.bad .material-icons-round{color:#ffc9c9}
+
+/* support */
+.chat{display:grid;grid-template-columns:320px 1fr;gap:0;height:calc(100vh - 130px);min-height:480px;padding:0;overflow:hidden}
+.clist{border-right:1px solid var(--line);overflow:auto;display:flex;flex-direction:column}.clist .search{padding:12px;min-width:0}.clist .search .material-icons-round{left:24px}
+.ci{display:flex;gap:11px;align-items:center;padding:11px 14px;cursor:pointer;border-bottom:1px solid var(--line)}.ci:hover{background:var(--soft)}.ci.on{background:rgba(108,92,231,.12)}
+.ci .mid{flex:1;min-width:0}.ci .mid b{display:flex;justify-content:space-between;gap:8px}.ci .mid b em{font-style:normal;font-weight:500;font-size:11px;color:var(--muted)}.ci .mid small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpane{display:flex;flex-direction:column;min-width:0;min-height:0}
+.ch{display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid var(--line)}.ch .mid{flex:1;min-width:0}
+.msgs{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--soft)}
+.msg{max-width:78%;padding:9px 13px;border-radius:16px;background:var(--card);border:1px solid var(--line);word-break:break-word;white-space:pre-wrap;animation:rise .25s both}.msg.admin{align-self:flex-end;background:var(--grad);color:#fff;border:0}
+.msg small{display:block;font-size:10.5px;opacity:.7;margin-top:3px}.msg.admin small{color:#fff}
+.edbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px;background:rgba(108,92,231,.12);font-size:12.5px;font-weight:600;border-top:1px solid var(--line)}.edbar[hidden]{display:none}.edbar span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aip{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.ai-pv{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;border:1.5px solid var(--line);background:var(--soft);color:var(--text);font-weight:600;font-size:13px;text-align:left;cursor:pointer;transition:.15s}
+.ai-pv.on{border-color:var(--brand);background:rgba(108,92,231,.12);box-shadow:0 0 0 3px rgba(108,92,231,.12)}
+.ai-lg{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;flex:none}
+.msg{cursor:pointer}.msg.del{font-style:italic;opacity:.75}.msg .msg-m{float:right;margin:-4px -6px 0 8px;opacity:.55;line-height:1}.msg .msg-m svg{width:18px;height:18px}
+.msg .qt{display:grid;gap:1px;padding:6px 9px;margin:-2px -4px 6px;border-left:3px solid var(--brand);background:rgba(108,92,231,.12);border-radius:10px;font-size:12px;text-align:left}.msg.admin .qt{border-left-color:rgba(255,255,255,.8);background:rgba(0,0,0,.18)}.msg .qt span{opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cin{display:flex;gap:9px;padding:12px;border-top:1px solid var(--line)}.cin input{flex:1;padding:11px 14px;border-radius:99px;border:1.5px solid var(--line);background:var(--soft);color:var(--text);font:inherit;outline:0}.cin input:focus{border-color:var(--brand)}
+.back{display:none}
+@media(max-width:800px){.chat{grid-template-columns:1fr;height:calc(100vh - 110px)}.chat.open .clist{display:none}.chat:not(.open) .cpane{display:none}.back{display:grid}}
+iframe.fx{width:100%;border:1px solid var(--line);border-radius:14px;background:#fff;min-height:160px}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:6px}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:var(--soft);border-radius:12px;padding:12px;white-space:pre-wrap;word-break:break-word;max-height:240px;overflow:auto}
+.ck{display:flex;flex-wrap:wrap;gap:8px}.ck label{display:flex;gap:7px;align-items:center;padding:7px 12px;border-radius:99px;background:var(--soft);border:1px solid var(--line);cursor:pointer;font-size:12.5px}.ck input{accent-color:var(--brand)}
+.danger-z{border-color:rgba(240,62,62,.4)}
+</style>
+</head>
+<body>
+<div id="boot" class="boot"><div class="spin"></div></div>
+<div id="auth" class="auth" hidden></div>
+<div id="app" class="app" hidden>
+  <aside id="side" class="side">
+    <div class="brand"><div class="logo"><span class="material-icons-round">admin_panel_settings</span></div><div><b id="brandName">Admin</b><small>Control panel</small></div></div>
+    <nav id="nav" class="nav"></nav>
+    <div class="side-foot"><div class="me"><div class="av" id="meAv">A</div><div><b id="meMail">admin</b><small id="meRole">admin</small></div><button class="act" id="logoutBtn" title="Log out"><span class="material-icons-round">logout</span></button></div></div>
+  </aside>
+  <div id="scrim" class="scrim"></div>
+  <main class="main">
+    <header class="top">
+      <button id="menuBtn" class="icon-btn" aria-label="Menu"><span class="material-icons-round">menu</span></button>
+      <h1 id="pageTitle">Dashboard</h1><div class="grow"></div>
+      <span class="live" id="live"><i></i><span id="liveTxt">Connecting…</span></span>
+      <button id="themeBtn" class="icon-btn" aria-label="Theme"><span class="material-icons-round">dark_mode</span></button>
+    </header>
+    <div id="view" class="view"></div>
+  </main>
+</div>
+<div id="shHost"></div><div id="toasts"></div>
+<script>
+'use strict';
+/* ====================== FIREBASE ====================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyC0lMrFSadDNitgurFZJ1q-B-gAER4Xj9A",
+  authDomain: "play-to-earn-18670.firebaseapp.com",
+  databaseURL: "https://play-to-earn-18670-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "play-to-earn-18670",
+  storageBucket: "play-to-earn-18670.firebasestorage.app",
+  messagingSenderId: "845271052086",
+  appId: "1:845271052086:web:231a33912b1f6ec6860d97",
+  measurementId: "G-Q6XTXERXND"
+};
+let db;
+try { firebase.initializeApp(firebaseConfig); db = firebase.database(); } catch (e) { console.error(e); }
+
+/* ====================== UTILS ====================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const safeUrl = u => { try { const x = new URL(String(u || '').trim()); return /^https?:$/.test(x.protocol) ? x.href : ''; } catch (e) { return ''; } };
+const h = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+const ico = n => `<span class="material-icons-round">${n}</span>`;
+const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+const money = v => '৳' + num(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const coin = v => `<span class="coin">${num(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>`;
+const pad = n => String(n).padStart(2, '0');
+const dayKey = d => { d = new Date(d); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+const fmtDate = d => { if (!d) return '—'; const x = new Date(d); return isNaN(x) ? '—' : x.toLocaleString([], { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); };
+const fmtShort = d => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
+const initial = s => String(s || '?').trim().charAt(0) || '?';
+const vals = o => o && typeof o === 'object' ? Object.values(o) : [];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let tOff = 0;
+const now = () => Date.now() + tOff;
+const rid = () => String(Date.now()) + Math.floor(Math.random() * 90 + 10);
+
+function toast(msg, type = 'ok') {
+  const t = h(`<div class="toast ${type}">${ico(type === 'ok' ? 'check_circle' : 'error')}<span>${esc(msg)}</span></div>`);
+  $('#toasts').appendChild(t);
+  setTimeout(() => { t.style.transition = '.3s'; t.style.opacity = 0; setTimeout(() => t.remove(), 300); }, type === 'ok' ? 2600 : 4500);
+}
+const fail = (e, ctx) => { console.error(ctx || '', e); toast((ctx ? ctx + ': ' : '') + (e && e.message || e), 'bad'); };
+
+function download(name, text, mime = 'text/plain') {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: mime + ';charset=utf-8' }));
+  a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function toCSV(rows, cols) {
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  return '﻿' + [cols.map(c => q(c.label)).join(',')].concat(rows.map(r => cols.map(c => q(c.get(r))).join(','))).join('\n');
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); } catch (e) {
+    const x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); try { document.execCommand('copy'); } catch (_) { } x.remove();
+  }
+  toast('Copied');
+}
+
+/* ---- sheet / dialog ---- */
+const sheetStack = [];
+function openSheet({ title, body, footer, wide, onClose }) {
+  const w = h(`<div class="shw"><div class="sheet ${wide ? 'wide' : ''}"><div class="sh-h"><h3>${esc(title)}</h3><button class="act" data-x>${ico('close')}</button></div><div class="sh-b"></div><div class="sh-f"></div></div></div>`);
+  const api = {
+    el: w, body: $('.sh-b', w), foot: $('.sh-f', w),
+    close() { const i = sheetStack.indexOf(api); if (i >= 0) sheetStack.splice(i, 1); w.remove(); onClose && onClose(); },
+    setTitle(t) { $('h3', w).textContent = t; }
+  };
+  if (body) api.body.appendChild(body);
+  if (footer && footer.length) footer.forEach(f => api.foot.appendChild(f)); else api.foot.hidden = true;
+  $('[data-x]', w).onclick = api.close;
+  w.addEventListener('mousedown', e => { if (e.target === w) api.close(); });
+  $('#shHost').appendChild(w); sheetStack.push(api);
+  return api;
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheetStack.length) sheetStack[sheetStack.length - 1].close(); });
+function btn(label, cls, fn, icon) {
+  const b = h(`<button class="btn ${cls || ''}">${icon ? ico(icon) : ''}<span>${esc(label)}</span></button>`);
+  if (fn) b.onclick = async () => {
+    if (b.disabled) return; b.disabled = true;
+    try { await fn(b); } catch (e) { fail(e); } finally { b.disabled = false; }
+  };
+  return b;
+}
+function ask({ title, msg, ok = 'Confirm', danger, input, placeholder, type = 'text', value = '' }) {
+  return new Promise(res => {
+    const w = h(`<div class="shw c"><div class="dlg"><h3>${esc(title || 'Are you sure?')}</h3><p>${esc(msg || '')}</p>${input ? `<div class="fld"><input id="askIn" type="${type}" placeholder="${esc(placeholder || '')}" value="${esc(value)}"></div>` : ''}<div class="btns"></div></div></div>`);
+    const done = v => { w.remove(); res(v); };
+    const bs = $('.btns', w);
+    const c = btn('Cancel', 'ghost'); c.onclick = () => done(input ? null : false);
+    const o = btn(ok, danger ? 'danger' : ''); o.onclick = () => done(input ? ($('#askIn', w).value) : true);
+    bs.append(c, o); document.body.appendChild(w);
+    const i = $('#askIn', w); if (i) { i.focus(); i.onkeydown = e => { if (e.key === 'Enter') o.click(); }; }
+    w.addEventListener('mousedown', e => { if (e.target === w) c.click(); });
+  });
+}
+
+/* ====================== CRYPTO (PBKDF2-SHA256) ====================== */
+const hex = b => [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+const unhex = s => Uint8Array.from((s || '').match(/../g) || [], x => parseInt(x, 16));
+const randSalt = () => { const a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a); return hex(a); };
+const K256 = new Uint32Array([0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]);
+const IV256 = new Uint32Array([0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]);
+const W256 = new Uint32Array(64);
+function sha256c(H, blk) {
+  const w = W256; for (let i = 0; i < 16; i++) w[i] = blk[i];
+  for (let i = 16; i < 64; i++) { const a = w[i - 15], b = w[i - 2]; w[i] = (w[i - 16] + ((a >>> 7 | a << 25) ^ (a >>> 18 | a << 14) ^ (a >>> 3)) + w[i - 7] + ((b >>> 17 | b << 15) ^ (b >>> 19 | b << 13) ^ (b >>> 10))) | 0; }
+  let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], hh = H[7];
+  for (let i = 0; i < 64; i++) {
+    const t1 = (hh + ((e >>> 6 | e << 26) ^ (e >>> 11 | e << 21) ^ (e >>> 25 | e << 7)) + ((e & f) ^ (~e & g)) + K256[i] + w[i]) | 0;
+    const t2 = (((a >>> 2 | a << 30) ^ (a >>> 13 | a << 19) ^ (a >>> 22 | a << 10)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+    hh = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+  }
+  const o = new Uint32Array(8);
+  o[0] = H[0] + a; o[1] = H[1] + b; o[2] = H[2] + c; o[3] = H[3] + d; o[4] = H[4] + e; o[5] = H[5] + f; o[6] = H[6] + g; o[7] = H[7] + hh;
+  return o;
+}
+function sha256bytes(bytes, H0, prefixLen) {
+  const len = bytes.length, padLen = Math.ceil((len + 9) / 64) * 64, buf = new Uint8Array(padLen);
+  buf.set(bytes); buf[len] = 0x80;
+  const dv = new DataView(buf.buffer), bits = (len + prefixLen) * 8;
+  dv.setUint32(padLen - 8, Math.floor(bits / 4294967296)); dv.setUint32(padLen - 4, bits >>> 0);
+  let H = H0; const blk = new Uint32Array(16);
+  for (let off = 0; off < padLen; off += 64) { for (let i = 0; i < 16; i++) blk[i] = dv.getUint32(off + i * 4); H = sha256c(H, blk); }
+  return H;
+}
+const w2b = H => { const b = new Uint8Array(32), dv = new DataView(b.buffer); for (let i = 0; i < 8; i++) dv.setUint32(i * 4, H[i]); return b; };
+function pbkdf2js(pw, salt, iter) {
+  if (pw.length > 64) pw = w2b(sha256bytes(pw, IV256, 0));
+  const ik = new Uint8Array(64), ok = new Uint8Array(64);
+  for (let i = 0; i < 64; i++) { const k = pw[i] || 0; ik[i] = k ^ 0x36; ok[i] = k ^ 0x5c; }
+  const toW = b => { const dv = new DataView(b.buffer), o = new Uint32Array(16); for (let i = 0; i < 16; i++) o[i] = dv.getUint32(i * 4); return o; };
+  const Hi = sha256c(IV256, toW(ik)), Ho = sha256c(IV256, toW(ok));
+  const m = new Uint8Array(salt.length + 4); m.set(salt); m[m.length - 1] = 1;
+  let U = sha256bytes(w2b(sha256bytes(m, Hi, 64)), Ho, 64);
+  const T = new Uint32Array(U), blk = new Uint32Array(16);
+  for (let n = 1; n < iter; n++) {
+    blk.fill(0); blk.set(U); blk[8] = 0x80000000; blk[15] = 768;
+    const I = sha256c(Hi, blk); blk.fill(0); blk.set(I); blk[8] = 0x80000000; blk[15] = 768;
+    U = sha256c(Ho, blk); for (let i = 0; i < 8; i++) T[i] ^= U[i];
+  }
+  return hex(w2b(T));
+}
+async function pbkdf2(pw, saltHex, iter = 100000) {
+  const pwb = new TextEncoder().encode(pw), salt = unhex(saltHex);
+  if (window.crypto && crypto.subtle) {
+    try {
+      const k = await crypto.subtle.importKey('raw', pwb, 'PBKDF2', false, ['deriveBits']);
+      const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: iter }, k, 256);
+      return hex(new Uint8Array(bits));
+    } catch (e) { /* fall through */ }
+  }
+  await sleep(10);
+  return pbkdf2js(pwb, salt, iter);
+}
+async function makeCred(pw) { const salt = randSalt(); return { salt, hash: await pbkdf2(pw, salt, 100000), iter: 100000 }; }
+const verifyCred = async (pw, c) => !!(c && c.salt && c.hash) && (await pbkdf2(pw, c.salt, c.iter || 100000)) === c.hash;
+
+/* ====================== STATE / BUS ====================== */
+const S = { me: null, users: [], uMap: {}, tx: [], wd: [], chats: {}, loaded: {}, conn: false };
+const bus = { f: {}, on(e, fn) { (this.f[e] = this.f[e] || new Set()).add(fn); return () => this.f[e].delete(fn); }, emit(e) { (this.f[e] || []).forEach(fn => { try { fn(); } catch (x) { console.error(x); } }); } };
+const debounced = {};
+function emitSoon(e) { clearTimeout(debounced[e]); debounced[e] = setTimeout(() => bus.emit(e), 120); }
+let globalOffs = [];
+function startGlobal() {
+  const on = (path, cb, evt) => { const r = db.ref(path); const f = r.on('value', cb, err => { console.error(path, err); toast('Read denied for "' + path + '" — check Firebase rules', 'bad'); }); globalOffs.push(() => r.off('value', f)); };
+  on('.info/serverTimeOffset', s => { tOff = num(s.val()); });
+  on('.info/connected', s => { S.conn = !!s.val(); const l = $('#live'); l.classList.toggle('on', S.conn); $('#liveTxt').textContent = S.conn ? 'Live' : 'Offline'; });
+  on('users', s => { const a = []; const m = {}; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') { const u = Object.assign({ _k: c.key }, v); a.push(u); m[c.key] = u; } }); S.users = a; S.uMap = m; S.loaded.users = 1; emitSoon('users'); });
+  on('transactions', s => { const a = []; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') a.push(Object.assign({ _k: c.key }, v)); }); a.sort((x, y) => new Date(y.date) - new Date(x.date)); S.tx = a; S.loaded.tx = 1; emitSoon('tx'); });
+  on('withdrawals', s => { const a = []; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') a.push(Object.assign({ _k: c.key }, v)); }); a.sort((x, y) => new Date(y.date) - new Date(x.date)); S.wd = a; S.loaded.wd = 1; emitSoon('wd'); });
+  on('supportChats', s => { const o = {}; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') { const x = Object.assign({}, v); delete x.messages; x._n = v.messages ? Object.keys(v.messages).length : 0; o[c.key] = x; } }); S.chats = o; S.loaded.chats = 1; emitSoon('chats'); if (!S.autoDone) { S.autoDone = 1; autoDeleteChats(); } });
+  const beat = () => db.ref('presence/admin').set(now()).catch(() => { });
+  beat(); const iv = setInterval(beat, 45000); globalOffs.push(() => clearInterval(iv));
+}
+function stopGlobal() { globalOffs.forEach(f => { try { f(); } catch (e) { } }); globalOffs = []; S.loaded = {}; S.autoDone = 0; }
+async function autoDeleteChats() {
+  try {
+    const d = num((await db.ref('supportSettings/autoDeleteDays').once('value')).val());
+    if (d <= 0) return; const cut = now() - d * 864e5; let n = 0;
+    for (const [uid, c] of Object.entries(S.chats)) if (num(c.lastUpdate) && num(c.lastUpdate) < cut) { await db.ref('supportChats/' + uid).remove(); n++; }
+    if (n) toast(n + ' old support chat(s) auto-deleted');
+  } catch (e) { console.error(e); }
+}
+
+/* ====================== AUTH ====================== */
+function authCard(inner) {
+  const a = $('#auth'); a.hidden = false; $('#boot').hidden = true; $('#app').hidden = true;
+  a.innerHTML = `<div class="auth-card"><div class="logo">${ico('admin_panel_settings')}</div>${inner}</div>`;
+  try { const c = localStorage.getItem('ewi_adminlogo'); if (c) applyAdminLogo(c); } catch (e) { }
+  return a;
+}
+function pwField(id, label, ph) { return `<div class="fld" style="margin-bottom:12px"><label>${label}</label><div class="eye"><input type="password" id="${id}" placeholder="${ph || ''}" autocomplete="off"><button type="button" data-eye="${id}">${ico('visibility')}</button></div></div>`; }
+function bindEyes(r) { $$('[data-eye]', r).forEach(b => b.onclick = () => { const i = $('#' + b.dataset.eye, r); i.type = i.type === 'password' ? 'text' : 'password'; }); }
+let authInfo = null;
+async function boot() {
+  $('#boot').hidden = false;
+  try {
+    if (!db) throw new Error('Firebase SDK did not load. Check your internet connection.');
+    const [a, l, u] = await Promise.all([db.ref('adminAuth').once('value'), db.ref('admin').once('value'), db.ref('adminUsers').once('value')]);
+    authInfo = { auth: a.val() || {}, legacy: l.val() || {}, legacyUsers: u.val() || {} };
+  } catch (e) {
+    authCard(`<h2>Can't reach the database</h2><p>${esc(e.message)}</p><div class="note bad">${ico('cloud_off')}<div>Check your connection and your Firebase Realtime Database rules, then retry.</div></div><button class="btn full" id="retry">Retry</button>`);
+    $('#retry').onclick = boot; return;
+  }
+  const has = Object.keys(authInfo.auth).length || authInfo.legacy.password || vals(authInfo.legacyUsers).some(x => x && x.password);
+  const saved = localStorage.getItem('ewi_admin');
+  if (saved && authInfo.auth[saved]) { enterApp(saved, authInfo.auth[saved]); return; }
+  has ? loginScreen() : setupScreen();
+}
+function setupScreen() {
+  const a = authCard(`<h2>Create owner account</h2><p>First-time setup. This is the only time you'll see this screen.</p>
+    <div class="fld" style="margin-bottom:12px"><label>Email</label><input type="email" id="sEmail" placeholder="you@example.com" autocomplete="off"></div>
+    ${pwField('sPw', 'Password (min 8 characters)')}${pwField('sPw2', 'Confirm password')}
+    <button class="btn full" id="sGo">${ico('verified_user')} Create & continue</button>`);
+  bindEyes(a);
+  const go = $('#sGo', a);
+  go.onclick = async () => {
+    const e = $('#sEmail', a).value.trim().toLowerCase(), p = $('#sPw', a).value, p2 = $('#sPw2', a).value;
+    if (!/^\S+@\S+\.\S+$/.test(e)) return toast('Enter a valid email', 'bad');
+    if (p.length < 8) return toast('Password must be at least 8 characters', 'bad');
+    if (p !== p2) return toast('Passwords do not match', 'bad');
+    go.disabled = true;
+    try {
+      const chk = await db.ref('adminAuth').once('value'); if (chk.exists()) { toast('An admin already exists — please log in', 'bad'); return boot(); }
+      const id = rid(), c = await makeCred(p);
+      const rec = { email: e, role: 'owner', createdAt: new Date().toISOString(), salt: c.salt, hash: c.hash, iter: c.iter };
+      await db.ref('adminAuth/' + id).set(rec); localStorage.setItem('ewi_admin', id); enterApp(id, rec);
+    } catch (x) { fail(x, 'Setup failed'); go.disabled = false; }
+  };
+}
+let fails = 0, lockUntil = 0;
+function loginScreen() {
+  const legacy = authInfo.legacy.password || vals(authInfo.legacyUsers).some(x => x && x.password);
+  const a = authCard(`<h2>Admin login</h2><p>Sign in to manage your app</p>
+    ${legacy && !Object.keys(authInfo.auth).length ? `<div class="note info">${ico('info')}<div>Log in with your existing admin credentials — they'll be upgraded to secure hashed storage automatically.</div></div>` : ''}
+    <div class="fld" style="margin-bottom:12px"><label>Email</label><input type="email" id="lEmail" autocomplete="username"></div>
+    ${pwField('lPw', 'Password')}
+    <button class="btn full" id="lGo">${ico('login')} Sign in</button>`);
+  bindEyes(a);
+  const go = $('#lGo', a);
+  const run = async () => {
+    if (Date.now() < lockUntil) return toast('Too many attempts. Wait ' + Math.ceil((lockUntil - Date.now()) / 1000) + 's', 'bad');
+    const e = $('#lEmail', a).value.trim().toLowerCase(), p = $('#lPw', a).value;
+    if (!e || !p) return toast('Enter email and password', 'bad');
+    go.disabled = true;
+    try {
+      const fresh = (await db.ref('adminAuth').once('value')).val() || {};
+      let hit = null;
+      for (const [id, r] of Object.entries(fresh)) if (String(r.email || '').toLowerCase() === e && await verifyCred(p, r)) { hit = [id, r]; break; }
+      if (!hit) hit = await tryLegacy(e, p);
+      if (!hit) { if (++fails >= 5) { lockUntil = Date.now() + 30000; fails = 0; } toast('Invalid email or password', 'bad'); go.disabled = false; return; }
+      fails = 0; localStorage.setItem('ewi_admin', hit[0]); enterApp(hit[0], hit[1]);
+    } catch (x) { fail(x, 'Login failed'); go.disabled = false; }
+  };
+  go.onclick = run; $('#lPw', a).onkeydown = ev => { if (ev.key === 'Enter') run(); };
+}
+async function tryLegacy(e, p) {
+  const l = authInfo.legacy || {};
+  if (l.password && String(l.email || '').toLowerCase() === e && l.password === p) {
+    const id = rid(), c = await makeCred(p);
+    const rec = { email: e, role: 'owner', createdAt: new Date().toISOString(), salt: c.salt, hash: c.hash, iter: c.iter };
+    await db.ref('adminAuth/' + id).set(rec); await db.ref('admin/password').remove(); authInfo.legacy.password = null; return [id, rec];
+  }
+  for (const [k, u] of Object.entries(authInfo.legacyUsers || {})) {
+    if (u && u.password && String(u.email || '').toLowerCase() === e && u.password === p) {
+      const id = rid(), c = await makeCred(p);
+      const rec = { email: e, role: 'admin', createdAt: new Date().toISOString(), salt: c.salt, hash: c.hash, iter: c.iter };
+      await db.ref('adminAuth/' + id).set(rec); await db.ref('adminUsers/' + k).remove(); delete authInfo.legacyUsers[k]; return [id, rec];
+    }
+  }
+  return null;
+}
+function enterApp(id, rec) {
+  S.me = Object.assign({ id }, rec);
+  $('#auth').hidden = true; $('#boot').hidden = true; $('#app').hidden = false;
+  $('#meMail').textContent = rec.email; $('#meRole').textContent = rec.role || 'admin'; $('#meAv').textContent = initial(rec.email);
+  wireAdminIdentity();
+  startGlobal(); buildNav(); route();
+}
+function logout() {
+  localStorage.removeItem('ewi_admin'); stopGlobal(); S.me = null; killView(); location.hash = '';
+  db.ref('presence/admin').remove().catch(() => { }); boot();
+}
+/* ====================== VIEW CONTEXT ====================== */
+let curCtx = null;
+function newCtx() {
+  const ctx = { el: document.createElement('div'), offs: [], dead: false };
+  ctx.listen = (path, cb) => { const r = db.ref(path); const f = r.on('value', s => { if (!ctx.dead) { try { cb(s); } catch (e) { console.error(path, e); } } }, err => toast('Read denied for "' + path + '"', 'bad')); ctx.offs.push(() => r.off('value', f)); };
+  ctx.sub = (evt, fn) => { ctx.offs.push(bus.on(evt, () => { if (!ctx.dead) fn(); })); };
+  ctx.cleanup = fn => ctx.offs.push(fn);
+  return ctx;
+}
+function killView() { if (curCtx) { curCtx.dead = true; curCtx.offs.forEach(f => { try { f(); } catch (e) { } }); curCtx = null; } }
+
+/* ====================== FORM BUILDER ====================== */
+class VErr extends Error { }
+function buildForm(fields, data = {}) {
+  const el = h('<div class="form"></div>'); const gs = [];
+  fields.forEach(f => {
+    let val = data[f.key] !== undefined && data[f.key] !== null ? data[f.key] : f.default;
+    const wrap = h(`<div class="fld ${f.half ? 'half' : ''}"><label>${esc(f.label || '')}${f.required ? ' <b>*</b>' : ''}</label><div class="ctl"></div>${f.hint ? `<small class="muted">${esc(f.hint)}</small>` : ''}</div>`);
+    if (f.type === 'switch' && !f.stack) { /* label stays above */ }
+    const ctl = $('.ctl', wrap); let get;
+    const bad = m => { wrap.classList.add('err'); const i = $('input,textarea,select', wrap); i && i.focus(); throw new VErr(m || (f.label + ' is required')); };
+    switch (f.type) {
+      case 'switch': {
+        const w = h(`<div class="swrow"><label class="sw"><input type="checkbox"><i></i></label><span>${esc(f.text || '')}</span></div>`);
+        const c = $('input', w); c.checked = val === true || val === 'true'; ctl.appendChild(w); get = () => c.checked; break;
+      }
+      case 'select': {
+        const s = h(`<select>${(f.options || []).map(o => { const [v, l] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(v)}">${esc(l)}</option>`; }).join('')}</select>`);
+        if (val !== undefined) s.value = String(val); ctl.appendChild(s); get = () => s.value; break;
+      }
+      case 'textarea': {
+        const t = h(`<textarea rows="${f.rows || 4}" placeholder="${esc(f.placeholder || '')}"></textarea>`); t.value = val == null ? '' : val; ctl.appendChild(t);
+        get = () => { const v = t.value.trim(); if (f.required && !v) bad(); return v; }; break;
+      }
+      case 'number': {
+        const i = h(`<input type="number" step="${f.step || 'any'}" placeholder="${esc(f.placeholder || '')}">`); if (val !== undefined && val !== '') i.value = val; ctl.appendChild(i);
+        get = () => {
+          const raw = i.value.trim();
+          if (raw === '') { if (f.required) bad(); return f.empty !== undefined ? f.empty : 0; }
+          const n = parseFloat(raw); if (!isFinite(n)) bad(f.label + ' must be a number');
+          if (f.min !== undefined && n < f.min) bad(f.label + ' must be at least ' + f.min);
+          if (f.max !== undefined && n > f.max) bad(f.label + ' must be at most ' + f.max);
+          return f.int ? Math.round(n) : n;
+        }; break;
+      }
+      case 'secret': {
+        const w = h(`<div class="eye"><input type="password" autocomplete="off" placeholder="${esc(f.placeholder || '')}"><button type="button">${ico('visibility')}</button></div>`);
+        const i = $('input', w); i.value = val == null ? '' : val; $('button', w).onclick = () => { i.type = i.type === 'password' ? 'text' : 'password'; }; ctl.appendChild(w);
+        get = () => { const v = i.value.trim(); if (f.required && !v) bad(); return v; }; break;
+      }
+      case 'url': case 'text': default: {
+        const i = h(`<input type="text" placeholder="${esc(f.placeholder || '')}" ${f.maxlen ? `maxlength="${f.maxlen}"` : ''}>`); i.value = val == null ? '' : val; ctl.appendChild(i);
+        let prev; if (f.preview) { prev = h('<div class="imgprev"><img alt=""></div>'); ctl.appendChild(prev); const im = $('img', prev); const up = () => { const u = safeUrl(i.value); if (u) { im.src = u; prev.classList.add('on'); } else prev.classList.remove('on'); }; i.addEventListener('input', up); im.onerror = () => prev.classList.remove('on'); up(); }
+        get = () => {
+          const v = i.value.trim(); if (f.required && !v) bad();
+          if (f.type === 'url' && v) { const u = safeUrl(v); if (!u) bad(f.label + ' must be a valid http(s) link'); return u; }
+          return v;
+        }; break;
+      }
+      case 'options': {
+        const max = f.max || 4, min = f.min || 2; const opts = Array.isArray(val) ? val.slice() : []; let correct = num(data[f.correctKey]) || 1;
+        const w = h('<div></div>'); const gid = 'c' + Math.random().toString(36).slice(2);
+        for (let n = 0; n < max; n++) {
+          const r = h(`<div class="optrow"><span class="tag">${'ABCD'[n]}</span><input type="text" placeholder="Option ${'ABCD'[n]}${n < min ? '' : ' (optional)'}" style="flex:1;padding:10px 13px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);color:var(--text);font:inherit"><input type="radio" name="${gid}" title="Correct answer"></div>`);
+          $('input[type=text]', r).value = opts[n] || ''; w.appendChild(r);
+        }
+        const radios = $$('input[type=radio]', w); (radios[Math.min(Math.max(correct, 1), max) - 1] || radios[0]).checked = true;
+        ctl.appendChild(w); ctl.appendChild(h('<small class="muted">Select the radio next to the correct answer.</small>'));
+        get = () => {
+          const rows = $$('.optrow', w).map((r, i) => ({ t: $('input[type=text]', r).value.trim(), c: $('input[type=radio]', r).checked }));
+          const filled = rows.filter(r => r.t); if (filled.length < min) bad('Enter at least ' + min + ' options');
+          const ci = filled.findIndex(r => r.c); if (ci < 0) bad('Mark which option is correct (it must be a filled option)');
+          return { __merge: true, [f.key]: filled.map(r => r.t), [f.correctKey]: ci + 1 };
+        }; break;
+      }
+      case 'chips': {
+        let list = (Array.isArray(val) ? val : vals(val)).map(Number).filter(n => isFinite(n));
+        const box = h('<div class="chips"></div>'); const row = h(`<div class="chiprow"><input type="number" step="any" placeholder="${esc(f.placeholder || 'Amount')}" style="flex:1;padding:10px 13px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);color:var(--text);font:inherit"></div>`);
+        const inp = $('input', row); const add = btn('Add', 'ghost sm', null, 'add'); row.appendChild(add);
+        const draw = () => { box.innerHTML = list.length ? '' : '<small class="muted">Nothing added yet.</small>'; list.forEach((n, i) => { const c = h(`<span class="chip">${n === 0 ? '0 (no win)' : '৳' + n}<button type="button">${ico('close')}</button></span>`); $('button', c).onclick = () => { list.splice(i, 1); draw(); }; box.appendChild(c); }); };
+        const doAdd = () => { const n = parseFloat(inp.value); if (!isFinite(n) || n < 0 || (n === 0 && !f.allowZero)) return toast(f.allowZero ? 'Enter 0 or a positive amount' : 'Enter an amount greater than 0', 'bad'); list.push(n); inp.value = ''; draw(); inp.focus(); };
+        add.onclick = doAdd; inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); doAdd(); } };
+        ctl.append(box, row); draw();
+        get = () => { if (inp.value.trim()) doAdd(); if (list.length < (f.min || 1)) bad('Add at least ' + (f.min || 1) + ' value(s)'); return list.slice(); }; break;
+      }
+      case 'contacts': {
+        const types = [['phone', 'Phone'], ['whatsapp', 'WhatsApp'], ['telegram', 'Telegram'], ['email', 'Email'], ['website', 'Website'], ['other', 'Other']];
+        const box = h('<div></div>'); const rows = [];
+        const addRow = c => {
+          const r = h(`<div class="crow"><select>${types.map(t => `<option value="${t[0]}">${t[1]}</option>`).join('')}</select><input type="text" placeholder="Label" class="in"><input type="text" placeholder="Number / link / email" class="in"><button type="button" class="act del">${ico('delete')}</button></div>`);
+          const [s, a, b] = $$('select,input', r); s.className = 'in'; s.value = c.type || 'phone'; a.value = c.label || ''; b.value = c.value || '';
+          $('button', r).onclick = () => { r.remove(); rows.splice(rows.indexOf(r), 1); }; rows.push(r); box.appendChild(r);
+        };
+        vals(val).forEach(addRow); const add = btn('Add contact', 'ghost sm', () => addRow({}), 'add'); ctl.append(box, add);
+        get = () => rows.map((r, i) => { const [s, a, b] = $$('select,input', r); return { id: i + 1, type: s.value, label: a.value.trim(), value: b.value.trim() }; }).filter(c => c.value); break;
+      }
+    }
+    gs.push({ f, get, wrap }); el.appendChild(wrap);
+  });
+  return {
+    el,
+    get() {
+      const out = {}; $$('.fld.err', el).forEach(x => x.classList.remove('err'));
+      for (const g of gs) { const v = g.get(); if (v && v.__merge) { delete v.__merge; Object.assign(out, v); } else out[g.f.key] = v; }
+      return out;
+    }
+  };
+}
+const clean = o => JSON.parse(JSON.stringify(o, (k, v) => (typeof v === 'number' && !isFinite(v)) ? 0 : v));
+
+/* ====================== CRUD BLOCK ====================== */
+function crud(ctx, cfg) {
+  cfg = withVis(cfg);
+  const root = h(`<section class="card block"><div class="blk-h"><div><h3>${ico(cfg.icon || 'list')} ${esc(cfg.title)} <span class="badge brand" data-n>0</span></h3>${cfg.desc ? `<p>${esc(cfg.desc)}</p>` : ''}</div><div class="blk-a"><div class="search">${ico('search')}<input type="text" placeholder="Search…"></div></div></div><div class="list" data-list><div class="sk" style="height:60px"></div></div></section>`);
+  const addB = btn('Add ' + (cfg.singular || 'item'), '', () => edit(null), 'add'); $('.blk-a', root).appendChild(addB);
+  let items = [], loaded = false, q = '';
+  const ref = () => db.ref(cfg.path);
+  const draw = () => {
+    const L = $('[data-list]', root); $('[data-n]', root).textContent = items.length;
+    const f = items.filter(i => !q || (cfg.search || ['title', 'name', 'question']).some(k => String(i[k] == null ? '' : i[k]).toLowerCase().includes(q)));
+    if (!loaded) return;
+    if (!f.length) { L.innerHTML = `<div class="empty">${ico(cfg.icon || 'inbox')}${items.length ? 'No matches.' : esc(cfg.empty || 'Nothing added yet.')}</div>`; return; }
+    L.innerHTML = '';
+    f.forEach(it => {
+      const r = cfg.row(it);
+      const row = h(`<div class="row"><div class="thumb">${r.thumb && safeUrl(r.thumb) ? `<img src="${esc(safeUrl(r.thumb))}" alt="" loading="lazy">` : ico(r.icon || cfg.icon || 'label')}</div><div class="mid"><b>${esc(r.title || '—')}</b><small>${esc(r.sub || '')}</small></div>${r.badge ? `<span class="badge ${r.badge[1] || ''}">${esc(r.badge[0])}</span>` : ''}<div class="acts"></div></div>`);
+      const A = $('.acts', row);
+      (cfg.actions || []).forEach(a => { const b = h(`<button class="act" title="${esc(a.label)}">${ico(a.icon)}</button>`); b.onclick = () => a.fn(it); A.appendChild(b); });
+      const e = h(`<button class="act" title="Edit">${ico('edit')}</button>`); e.onclick = () => edit(it);
+      const d = h(`<button class="act del" title="Delete">${ico('delete')}</button>`); d.onclick = async () => { if (await ask({ title: 'Delete this ' + (cfg.singular || 'item') + '?', msg: r.title || '', ok: 'Delete', danger: true })) ref().child(it._k).remove().then(() => toast('Deleted')).catch(x => fail(x)); };
+      A.append(e, d); L.appendChild(row);
+    });
+  };
+  function edit(it) {
+    const form = buildForm(cfg.fields, it || cfg.defaults || {});
+    const sv = btn(it ? 'Save changes' : 'Add', '', async () => {
+      let d; try { d = form.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
+      if (cfg.prepare) d = cfg.prepare(d, it); if (!d) return;
+      d = clean(d);
+      if (it) { await ref().child(it._k).update(d); }
+      else {
+        let key = cfg.push ? ref().push().key : String(Date.now());
+        if (!cfg.push) { while (items.some(x => x._k === key)) key = String(+key + 1); d.id = Number(key); }
+        if (cfg.stamp === 'iso') d.date = new Date().toISOString(); else if (cfg.stamp === 'ms') d.date = Date.now();
+        await ref().child(key).set(d);
+      }
+      toast(it ? 'Saved' : 'Added'); sh.close();
+    }, 'check');
+    const sh = openSheet({ title: (it ? 'Edit ' : 'Add ') + (cfg.singular || 'item'), body: form.el, footer: [btn('Cancel', 'ghost', () => sh.close()), sv] });
+    setTimeout(() => { const i = $('input,textarea', form.el); i && i.focus(); }, 80);
+  }
+  ctx.listen(cfg.path, s => {
+    items = []; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') items.push(Object.assign({ _k: c.key }, v)); });
+    items.sort((a, b) => cfg.sortFn ? cfg.sortFn(a, b) : String(b._k).localeCompare(String(a._k), undefined, { numeric: true }));
+    loaded = true; draw();
+  });
+  $('.search input', root).oninput = e => { q = e.target.value.trim().toLowerCase(); draw(); };
+  return root;
+}
+
+/* ====================== SETTINGS BLOCK (single doc / scalar) ====================== */
+function settings(ctx, cfg) {
+  const root = h(`<section class="card block"><div class="blk-h"><div><h3>${ico(cfg.icon || 'tune')} ${esc(cfg.title)}</h3>${cfg.desc ? `<p>${esc(cfg.desc)}</p>` : ''}</div></div>${cfg.warn ? `<div class="note">${ico('warning')}<div>${esc(cfg.warn)}</div></div>` : ''}<div data-f><div class="sk" style="height:80px"></div></div><div class="blk-a" data-b style="margin-top:16px"></div></section>`);
+  let form = null, loaded = false;
+  const B = $('[data-b]', root);
+  const save = btn(cfg.saveLabel || 'Save', '', async () => {
+    if (!form) return; let d; try { d = form.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
+    const v = cfg.to ? cfg.to(d) : (cfg.raw ? d.value : d); if (v === false) return;
+    const p = db.ref(cfg.path);
+    if (v === null || v === '') await p.remove(); else if (cfg.merge && typeof v === 'object') await p.update(clean(v)); else await p.set(typeof v === 'object' ? clean(v) : v);
+    toast(cfg.savedMsg || 'Saved');
+  }, 'save');
+  B.appendChild(save); (cfg.buttons || []).forEach(b => B.appendChild(btn(b.label, b.cls || 'ghost', () => b.fn(() => form.get(), root), b.icon)));
+  ctx.listen(cfg.path, s => {
+    if (loaded && root.contains(document.activeElement) && document.activeElement.matches('input,textarea,select')) return;
+    let v = s.val(); const data = cfg.from ? cfg.from(v) : (cfg.raw ? { value: v } : (v && typeof v === 'object' ? v : {}));
+    form = buildForm(cfg.fields, data); const F = $('[data-f]', root); F.innerHTML = ''; F.appendChild(form.el); loaded = true;
+  });
+  return root;
+}
+
+/* page header helper */
+function pageIntro(text) { return h(`<p class="muted" style="margin:-4px 2px 16px;max-width:720px">${esc(text)}</p>`); }
+/* ====================== DATA HELPERS ====================== */
+const r2 = n => Math.round(n * 100) / 100;
+async function addBalance(uid, delta, guard) {
+  if (!S.uMap[uid]) { toast('User no longer exists — balance not changed', 'bad'); return null; }
+  const res = await db.ref('users/' + uid + '/balance').transaction(c => { const n = r2(num(c) + delta); if (guard && n < 0) return; return n; });
+  return res.committed ? num(res.snapshot.val()) : null;
+}
+function writeTx(uid, type, amount, description, extra) {
+  const key = rid(), u = S.uMap[uid] || {};
+  return db.ref('transactions/' + key).set(clean(Object.assign({ id: Number(key), userId: isNaN(uid) ? uid : Number(uid), username: u.username || '', type, amount: Math.abs(r2(amount)), description, date: new Date().toISOString() }, extra || {})));
+}
+const userName = id => (S.uMap[id] && S.uMap[id].username) || ('User ' + id);
+const refsOf = u => vals(u.referrals);
+const statusBadge = s => `<span class="badge ${s === 'approved' ? 'ok' : s === 'rejected' ? 'bad' : 'warn'}">${esc(s || 'pending')}</span>`;
+const skeleton = n => Array.from({ length: n }, () => '<div class="sk" style="height:64px;margin-bottom:10px"></div>').join('');
+const avatarHtml = u => `<div class="av">${u && u.profilePic && safeUrl(u.profilePic) ? `<img src="${esc(safeUrl(u.profilePic))}" alt="">` : esc(initial(u && u.username))}</div>`;
+
+/* ====================== DASHBOARD ====================== */
+function barSVG(values, labels, fmt, c1, c2) {
+  const W = 460, H = 200, pl = 10, pb = 28, pt = 26, n = values.length, step = (W - pl * 2) / n, bw = Math.min(42, step * .6), max = Math.max(...values, 0);
+  const id = 'g' + Math.random().toString(36).slice(2, 7);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs>`;
+  for (let i = 0; i < 4; i++) { const y = pt + (H - pt - pb) * i / 3; s += `<line x1="${pl}" x2="${W - pl}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-dasharray="3 5"/>`; }
+  values.forEach((v, i) => {
+    const hh = max ? Math.max(v > 0 ? 4 : 0, v / max * (H - pt - pb)) : 0, x = pl + step * i + (step - bw) / 2, y = H - pb - hh;
+    s += `<rect x="${x}" y="${y}" width="${bw}" height="${hh}" rx="8" fill="url(#${id})"><title>${esc(labels[i])}: ${esc(fmt(v))}</title></rect>`;
+    if (v > 0) s += `<text x="${x + bw / 2}" y="${y - 6}" font-size="11" font-weight="700" text-anchor="middle" fill="var(--text)">${esc(fmt(v))}</text>`;
+    s += `<text x="${x + bw / 2}" y="${H - 8}" font-size="11" text-anchor="middle" fill="var(--muted)">${esc(labels[i])}</text>`;
+  });
+  return s + '</svg>';
+}
+function donutSVG(parts) {
+  const total = parts.reduce((a, p) => a + p.v, 0), R = 52, C = 2 * Math.PI * R; let off = 0;
+  let s = `<svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="${R}" fill="none" stroke="var(--line)" stroke-width="18"/>`;
+  if (total) parts.forEach(p => { if (!p.v) return; const len = p.v / total * C; s += `<circle cx="70" cy="70" r="${R}" fill="none" stroke="${p.c}" stroke-width="18" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-off}" transform="rotate(-90 70 70)"/>`; off += len; });
+  return s + `<text x="70" y="68" text-anchor="middle" font-size="22" font-weight="800" fill="var(--text)">${total}</text><text x="70" y="86" text-anchor="middle" font-size="10" fill="var(--muted)">requests</text></svg>`;
+}
+function vDash(ctx) {
+  const el = ctx.el;
+  el.innerHTML = `<div class="stats" id="st"></div><div class="grid2"><section class="card"><div class="blk-h"><h3>${ico('trending_up')} Earnings paid to users · 7 days</h3></div><div class="chart" id="cE"></div></section><section class="card"><div class="blk-h"><h3>${ico('person_add')} New signups · 7 days</h3></div><div class="chart" id="cS"></div></section></div>
+  <div class="grid3"><section class="card"><div class="blk-h"><h3>${ico('donut_large')} Withdrawals</h3></div><div class="donut" id="dn"></div></section><section class="card"><div class="blk-h"><h3>${ico('emoji_events')} Top earners</h3></div><div class="list" id="tp"></div></section><section class="card"><div class="blk-h"><h3>${ico('history')} Recent activity</h3><a href="#/transactions" class="badge brand" style="text-decoration:none">View all</a></div><div class="list" id="rc"></div></section></div>`;
+  const stat = (g, i, l, v, s) => `<div class="card stat"><div class="si ${g}">${ico(i)}</div><div><b>${v}</b><span>${l}</span>${s ? `<small>${s}</small>` : ''}</div></div>`;
+  function upd() {
+    const L = S.loaded;
+    if (!L.users || !L.tx || !L.wd) { $('#st', el).innerHTML = Array.from({ length: 6 }, () => '<div class="card"><div class="sk" style="height:48px"></div></div>').join(''); return; }
+    const today = dayKey(now()), pend = S.wd.filter(w => (w.status || 'pending') === 'pending'), paid = S.wd.filter(w => w.status === 'approved').reduce((a, w) => a + num(w.amount), 0);
+    const bal = S.users.reduce((a, u) => a + num(u.balance), 0), refs = S.users.reduce((a, u) => a + refsOf(u).length, 0), banned = S.users.filter(u => u.banned).length;
+    $('#st', el).innerHTML =
+      stat('g1', 'people', 'Total users', S.users.length, banned ? banned + ' banned' : '') +
+      stat('g2', 'person_add', 'Signups today', S.users.filter(u => u.createdAt && dayKey(u.createdAt) === today).length) +
+      stat('g3', 'payments', 'Total paid out', money(paid), S.wd.filter(w => w.status === 'approved').length + ' approved') +
+      stat('g4', 'hourglass_top', 'Pending withdrawals', pend.length, money(pend.reduce((a, w) => a + num(w.amount), 0))) +
+      stat('g5', 'account_balance_wallet', 'Balance held by users', money(bal)) +
+      stat('g6', 'group_add', 'Total referrals', refs);
+    const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(now() - (6 - i) * 864e5); return { k: dayKey(d), l: d.toLocaleDateString([], { weekday: 'short' }) }; });
+    const ev = days.map(d => r2(S.tx.filter(t => t.type === 'earn' && t.date && dayKey(t.date) === d.k).reduce((a, t) => a + num(t.amount), 0)));
+    const sv = days.map(d => S.users.filter(u => u.createdAt && dayKey(u.createdAt) === d.k).length);
+    $('#cE', el).innerHTML = barSVG(ev, days.map(d => d.l), v => '৳' + v, '#6c5ce7', '#00c2ff');
+    $('#cS', el).innerHTML = barSVG(sv, days.map(d => d.l), v => String(v), '#ff4d8d', '#ffc83d');
+    const cnt = s => S.wd.filter(w => (w.status || 'pending') === s).length;
+    const parts = [{ n: 'Pending', v: cnt('pending'), c: '#f59f00' }, { n: 'Approved', v: cnt('approved'), c: '#12b886' }, { n: 'Rejected', v: cnt('rejected'), c: '#f03e3e' }];
+    $('#dn', el).innerHTML = donutSVG(parts) + `<div class="legend">${parts.map(p => `<div><i style="background:${p.c}"></i>${p.n}<b>${p.v}</b></div>`).join('')}</div>`;
+    const top = S.users.slice().sort((a, b) => num(b.totalEarned) - num(a.totalEarned)).slice(0, 5);
+    $('#tp', el).innerHTML = top.length ? top.map((u, i) => `<div class="row click" data-u="${esc(u._k)}"><b style="width:20px;color:var(--muted)">${i + 1}</b>${avatarHtml(u)}<div class="mid"><b>${esc(u.username)}</b><small>${esc(u.number || '')}</small></div>${coin(u.totalEarned)}</div>`).join('') : `<div class="empty">${ico('group')}No users yet.</div>`;
+    $$('[data-u]', el).forEach(r => r.onclick = () => openUser(r.dataset.u));
+    const rc = S.tx.slice(0, 8);
+    $('#rc', el).innerHTML = rc.length ? rc.map(t => { const neg = t.type === 'withdraw' || (t.type === 'admin' && num(t.delta) < 0); return `<div class="row"><div class="mid"><b>${esc(t.description || t.type)}</b><small>${esc(t.username || userName(t.userId))} · ${esc(fmtShort(t.date))}</small></div><span class="${neg ? 'neg' : 'pos'}">${neg ? '−' : '+'}${num(t.amount).toFixed(2)}</span></div>`; }).join('') : `<div class="empty">${ico('receipt_long')}No transactions yet.</div>`;
+  }
+  ['users', 'tx', 'wd'].forEach(e => ctx.sub(e, upd)); upd();
+}
+
+/* ====================== USERS ====================== */
+function vUsers(ctx) {
+  const el = ctx.el; let q = '', sort = 'new', flt = 'all', shown = 40;
+  el.innerHTML = `<section class="card"><div class="blk-h"><h3>${ico('people')} All users <span class="badge brand" id="uN">0</span></h3><div class="blk-a"><div class="search">${ico('search')}<input id="uQ" placeholder="Search name, number, UID, referral code…"></div></div></div>
+  <div class="flt"><select id="uS"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="bal">Highest balance</option><option value="earn">Highest earned</option><option value="name">Name A–Z</option></select><select id="uF"><option value="all">All users</option><option value="banned">Banned only</option><option value="active">Not banned</option><option value="bal">With balance</option></select></div>
+  <div class="urow hd"><span>User</span><span>Number</span><span>Balance</span><span>Earned</span><span>Joined</span></div><div id="uL">${skeleton(5)}</div><div class="more" id="uM"></div></section>`;
+  const draw = () => {
+    if (!S.loaded.users) return;
+    let a = S.users.filter(u => (flt === 'all' || (flt === 'banned' ? u.banned : flt === 'active' ? !u.banned : num(u.balance) > 0)) && (!q || [u.username, u.number, u._k, u.referralCode].some(x => String(x || '').toLowerCase().includes(q))));
+    const cmp = { new: (x, y) => new Date(y.createdAt || 0) - new Date(x.createdAt || 0), old: (x, y) => new Date(x.createdAt || 0) - new Date(y.createdAt || 0), bal: (x, y) => num(y.balance) - num(x.balance), earn: (x, y) => num(y.totalEarned) - num(x.totalEarned), name: (x, y) => String(x.username).localeCompare(String(y.username)) }[sort];
+    a.sort(cmp); $('#uN', el).textContent = a.length;
+    const L = $('#uL', el); L.innerHTML = a.length ? '' : `<div class="empty">${ico('person_search')}${S.users.length ? 'No users match.' : 'No users have signed up yet.'}</div>`;
+    a.slice(0, shown).forEach(u => {
+      const r = h(`<div class="urow"><div class="u">${avatarHtml(u)}<div><b>${esc(u.username)} ${u.banned ? '<span class="badge bad">banned</span>' : ''}</b><small>UID ${esc(u._k)}</small></div></div><span class="c2">${esc(u.number || '—')}</span><span class="c3">${coin(u.balance)}</span><span class="c4">${coin(u.totalEarned)}</span><span class="c1"><small>${esc(u.createdAt ? new Date(u.createdAt).toLocaleDateString([], { day: '2-digit', month: 'short', year: '2-digit' }) : '—')}</small><span class="mob" style="display:none"></span></span></div>`);
+      r.onclick = () => openUser(u._k); L.appendChild(r);
+    });
+    $('#uM', el).innerHTML = a.length > shown ? '' : '';
+    if (a.length > shown) { const m = btn('Show more (' + (a.length - shown) + ')', 'ghost', () => { shown += 40; draw(); }); $('#uM', el).appendChild(m); }
+  };
+  $('#uQ', el).oninput = e => { q = e.target.value.trim().toLowerCase(); shown = 40; draw(); };
+  $('#uS', el).onchange = e => { sort = e.target.value; draw(); }; $('#uF', el).onchange = e => { flt = e.target.value; shown = 40; draw(); };
+  ctx.sub('users', draw); draw();
+}
+function openUser(uid) {
+  const body = h('<div></div>'); let sh, wdg = null;
+  Promise.all([db.ref('appSettings/withdrawGate').once('value'), db.ref('appSettings/withdrawSteps').once('value')]).then(([g, st]) => { wdg = { on: (g.val() || {}).enabled === true, steps: Object.entries(st.val() || {}).map(([k, x]) => Object.assign({ _k: k }, x)).filter(x => x && x.enabled !== false && x.title) }; render(); }).catch(() => { });
+  const wdSection = u => {
+    if (!wdg) return '';
+    const rows = wdg.steps.map(x => { let done, label = '';
+      if (x.type === 'earned') { const tg = num(x.target), v = num(u.totalEarned); done = v >= tg; label = money(v) + ' / ' + money(tg) + ' earned'; }
+      else if (x.type === 'days') { const tg = num(x.target), d = u.createdAt ? Math.max(0, Math.floor((Date.now() - new Date(u.createdAt).getTime()) / 864e5)) : 0; done = d >= tg; label = d + ' / ' + tg + ' days old'; }
+      else { done = !!((u.wdSteps || {})[x._k]); label = x.type === 'link' ? 'Link step' : 'Rule accepted'; }
+      return { x, done, label }; });
+    const dn = rows.filter(r => r.done).length, complete = dn === rows.length;
+    const head = !wdg.on ? '<span class="badge">requirement is OFF</span>' : (complete ? '<span class="badge ok">withdraw activated</span>' : '<span class="badge bad">not activated</span>');
+    return `<h4 style="margin-bottom:8px">Withdraw activation</h4><div class="card" style="margin-bottom:18px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">${head}<small>${dn}/${rows.length} steps done${wdg.on && complete && u.withdrawActiveAt ? ' · activated ' + esc(fmtShort(u.withdrawActiveAt)) : ''}</small></div><div class="list">${rows.length ? rows.map(r => `<div class="row"><div class="mid"><b>${esc(r.x.title)}</b><small>${esc(r.label)}</small></div><span class="badge ${r.done ? 'ok' : ''}">${r.done ? 'done' : 'pending'}</span></div>`).join('') : '<small class="muted">No activation steps added yet.</small>'}</div></div>`;
+  };
+  const render = () => {
+    const u = S.uMap[uid]; if (!u) { body.innerHTML = `<div class="empty">${ico('person_off')}User not found (maybe deleted).</div>`; return; }
+    const txs = S.tx.filter(t => String(t.userId) === uid).slice(0, 15), wds = S.wd.filter(w => String(w.userId) === uid), refs = refsOf(u).sort((a, b) => new Date(b.date) - new Date(a.date));
+    const by = u.referredBy != null && u.referredBy !== '' ? userName(u.referredBy) : null;
+    body.innerHTML = `<div style="display:flex;gap:14px;align-items:center">${avatarHtml(u).replace('class="av"', 'class="av" style="width:64px;height:64px;font-size:26px"')}<div style="flex:1;min-width:0"><h3>${esc(u.username)} ${u.banned ? '<span class="badge bad">banned</span>' : '<span class="badge ok">active</span>'}</h3><small>UID ${esc(uid)} · joined ${esc(fmtDate(u.createdAt))}</small></div></div>
+    <div class="kv"><div><small>Balance</small><b>${money(u.balance)}</b></div><div><small>Total earned</small><b>${money(u.totalEarned)}</b></div><div><small>Referrals</small><b>${refs.length}</b></div><div><small>Withdrawals</small><b>${wds.length}</b></div></div>
+    <div class="card" style="margin-bottom:14px"><dl class="dl"><dt>Number</dt><dd>${esc(u.number || '—')}</dd><dt>Referral code</dt><dd>${esc(u.referralCode || '—')}</dd><dt>Referred by</dt><dd>${by ? esc(by) : '—'}</dd><dt>Last check-in</dt><dd>${esc(fmtDate(u.lastCheckin))}</dd>${u.bio ? `<dt>Bio</dt><dd>${esc(u.bio)}</dd>` : ''}${u.work ? `<dt>Work</dt><dd>${esc(u.work)}</dd>` : ''}${u.study ? `<dt>Study</dt><dd>${esc(u.study)}</dd>` : ''}${u.hobby ? `<dt>Hobby</dt><dd>${esc(u.hobby)}</dd>` : ''}</dl></div>
+    ${wdSection(u)}
+    <div class="blk-a" id="uA" style="margin-bottom:18px"></div>
+    <h4 style="margin-bottom:8px">Referrals (${refs.length})</h4><div class="list" style="margin-bottom:18px">${refs.length ? refs.slice(0, 10).map(r => `<div class="row"><div class="mid"><b>${esc(r.username)}</b><small>${esc(fmtShort(r.date))}</small></div><span class="pos">+${num(r.commission).toFixed(2)}</span></div>`).join('') : '<small class="muted">No referrals.</small>'}</div>
+    <h4 style="margin-bottom:8px">Withdrawals (${wds.length})</h4><div class="list" style="margin-bottom:18px">${wds.length ? wds.slice(0, 8).map(w => `<div class="row"><div class="mid"><b>${money(w.amount)} · ${esc(w.method)}</b><small>${esc(fmtShort(w.date))}</small></div>${statusBadge(w.status)}</div>`).join('') : '<small class="muted">No withdrawals.</small>'}</div>
+    <h4 style="margin-bottom:8px">Recent transactions</h4><div class="list">${txs.length ? txs.map(t => { const neg = t.type === 'withdraw' || (t.type === 'admin' && num(t.delta) < 0); return `<div class="row"><div class="mid"><b>${esc(t.description)}</b><small>${esc(fmtShort(t.date))}</small></div><span class="${neg ? 'neg' : 'pos'}">${neg ? '−' : '+'}${num(t.amount).toFixed(2)}</span></div>`; }).join('') : '<small class="muted">No transactions.</small>'}</div>`;
+    const A = $('#uA', body);
+    A.append(btn('Edit balance', '', () => editBalance(uid), 'edit'),
+      btn(u.banned ? 'Unban' : 'Ban user', u.banned ? 'ok' : 'ghost', async () => { if (!u.banned && !await ask({ title: 'Ban ' + u.username + '?', msg: 'They will be logged out and blocked from the app.', ok: 'Ban', danger: true })) return; await db.ref('users/' + uid).update({ banned: !u.banned }); toast(u.banned ? 'User unbanned' : 'User banned'); }, u.banned ? 'lock_open' : 'block'),
+      btn('Reset password', 'ghost', () => resetPw(uid), 'key'),
+      btn('Delete', 'danger', () => delUser(uid, () => sh.close()), 'delete_forever'));
+  };
+  sh = openSheet({ title: 'User details', body, wide: true, onClose: () => offs.forEach(f => f()) });
+  const offs = ['users', 'tx', 'wd'].map(e => bus.on(e, render)); render();
+}
+function editBalance(uid) {
+  const u = S.uMap[uid]; if (!u) return;
+  const form = buildForm([{ key: 'mode', label: 'Action', type: 'select', options: [['add', 'Add to balance'], ['sub', 'Deduct from balance'], ['set', 'Set exact balance']], default: 'add' }, { key: 'amount', label: 'Amount (৳)', type: 'number', required: true, min: 0 }, { key: 'reason', label: 'Reason', type: 'text', required: true, hint: 'Shown to the user in their transaction history.' }], {});
+  const go = btn('Apply', '', async () => {
+    let d; try { d = form.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
+    let before = 0, after = 0;
+    const res = await db.ref('users/' + uid + '/balance').transaction(c => { c = num(c); before = c; const n = d.mode === 'add' ? c + d.amount : d.mode === 'sub' ? c - d.amount : d.amount; if (n < 0) return; after = r2(n); return after; });
+    if (!res.committed) return toast('Balance cannot go below zero', 'bad');
+    const diff = r2(after - before); if (!diff) { toast('No change'); return sh.close(); }
+    await writeTx(uid, 'admin', diff, `Admin adjustment: ${diff > 0 ? '+' : '-'}${Math.abs(diff)} (${d.reason})`, { delta: diff });
+    toast('Balance updated: ' + money(after)); sh.close();
+  }, 'check');
+  const sh = openSheet({ title: 'Edit balance · ' + u.username, body: h(`<div><div class="kv"><div><small>Current balance</small><b>${money(u.balance)}</b></div></div></div>`), footer: [btn('Cancel', 'ghost', () => sh.close()), go] });
+  sh.body.appendChild(form.el);
+}
+function resetPw(uid) {
+  const u = S.uMap[uid]; if (!u) return;
+  const form = buildForm([{ key: 'pw', label: 'New password (min 6 characters)', type: 'secret', required: true }], {});
+  const go = btn('Set password', '', async () => {
+    let d; try { d = form.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
+    if (d.pw.length < 6) return toast('Password must be at least 6 characters', 'bad');
+    const c = await makeCred(d.pw);
+    await db.ref('credentials/' + uid).set(c);
+    await db.ref('users/' + uid + '/password').remove();
+    if (u.username) await db.ref('usernames/' + String(u.username).toLowerCase()).transaction(v => v == null ? (isNaN(uid) ? uid : Number(uid)) : v);
+    toast('Password updated for ' + u.username); sh.close();
+  }, 'key');
+  const sh = openSheet({ title: 'Reset password · ' + u.username, body: form.el, footer: [btn('Cancel', 'ghost', () => sh.close()), go] });
+}
+async function delUser(uid, done) {
+  const u = S.uMap[uid]; if (!u) return;
+  if (!await ask({ title: 'Delete ' + u.username + '?', msg: 'This permanently removes the account, credentials, avatar and support chat. Transactions and withdrawals are kept for your records.', ok: 'Delete forever', danger: true })) return;
+  const lower = String(u.username || '').toLowerCase();
+  await Promise.all([db.ref('users/' + uid).remove(), db.ref('credentials/' + uid).remove(), db.ref('avatars/' + uid).remove(), db.ref('avatars/' + uid + '_cover').remove(), db.ref('supportChats/' + uid).remove(),
+  lower ? db.ref('usernames/' + lower).transaction(v => (String(v) === uid ? null : v)) : null].filter(Boolean));
+  toast('User deleted'); done && done();
+}
+
+/* ====================== WITHDRAWALS ====================== */
+const wdSt = w => w.status || 'pending';
+function vWd(ctx) {
+  const el = ctx.el; let tab = 'all', q = '';
+  el.innerHTML = `<section class="card"><div class="blk-h"><h3>${ico('account_balance_wallet')} Withdrawal requests</h3><div class="blk-a"><div class="search">${ico('search')}<input id="wQ" placeholder="Search user, number, method…"></div></div></div><div class="tabs" id="wT"></div><div class="list" id="wL">${skeleton(4)}</div></section>`;
+  const csvBtn = btn('Export CSV', 'ghost sm', () => { const a = filtered(); download('withdrawals.csv', toCSV(a, [{ label: 'ID', get: w => w._k }, { label: 'Date', get: w => w.date }, { label: 'User', get: w => w.username }, { label: 'UID', get: w => w.userId }, { label: 'Method', get: w => w.method }, { label: 'Number', get: w => w.number }, { label: 'Amount', get: w => w.amount }, { label: 'Status', get: wdSt }, { label: 'Note', get: w => w.note }]), 'text/csv'); }, 'download');
+  $('.blk-a', el).appendChild(csvBtn);
+  const filtered = () => S.wd.filter(w => (tab === 'all' || wdSt(w) === tab) && (!q || [w.username, w.number, w.method, w.userId, w._k].some(x => String(x || '').toLowerCase().includes(q))));
+  const draw = () => {
+    if (!S.loaded.wd) return;
+    const c = s => S.wd.filter(w => s === 'all' || wdSt(w) === s).length;
+    $('#wT', el).innerHTML = ['all', 'pending', 'approved', 'rejected'].map(s => `<button class="tab ${tab === s ? 'on' : ''}" data-t="${s}">${s[0].toUpperCase() + s.slice(1)}<em>${c(s)}</em></button>`).join('');
+    $$('[data-t]', el).forEach(b => b.onclick = () => { tab = b.dataset.t; draw(); });
+    const a = filtered(), L = $('#wL', el);
+    L.innerHTML = a.length ? '' : `<div class="empty">${ico('account_balance_wallet')}${S.wd.length ? 'Nothing in this view.' : 'No withdrawal requests yet.'}</div>`;
+    a.slice(0, 100).forEach(w => {
+      const r = h(`<div class="row click"><div class="thumb">${ico('payments')}</div><div class="mid"><b>${esc(w.username || userName(w.userId))} · ${money(w.amount)}</b><small>${esc(w.method || '')} · ${esc(w.number || '')} · ${esc(fmtShort(w.date))}</small></div>${statusBadge(wdSt(w))}</div>`);
+      r.onclick = () => openWd(w._k); L.appendChild(r);
+    });
+  };
+  $('#wQ', el).oninput = e => { q = e.target.value.trim().toLowerCase(); draw(); };
+  ctx.sub('wd', draw); ctx.sub('users', () => { }); draw();
+}
+function openWd(key) {
+  const body = h('<div></div>'); let sh;
+  const render = () => {
+    const w = S.wd.find(x => x._k === key); if (!w) { body.innerHTML = '<div class="empty">Request not found.</div>'; return; }
+    const u = S.uMap[w.userId], b = w.bankDetails || {}, st = wdSt(w);
+    body.innerHTML = `<div class="kv"><div><small>Amount</small><b>${money(w.amount)}</b></div><div><small>Status</small><b>${statusBadge(st)}</b></div><div><small>User balance now</small><b>${u ? money(u.balance) : '—'}</b></div></div>
+    <div class="card"><dl class="dl"><dt>User</dt><dd>${esc(w.username || userName(w.userId))} <small>(UID ${esc(w.userId)})</small></dd><dt>Method</dt><dd>${esc(w.method)}</dd><dt>${w.bankDetails ? 'Account no.' : 'Number'}</dt><dd>${esc(w.number)} <button class="badge brand" data-cp>copy</button></dd>
+    ${w.bankDetails ? `<dt>Bank</dt><dd>${esc(b.bankName)}</dd><dt>Holder</dt><dd>${esc(b.accountHolderName)}</dd><dt>Branch</dt><dd>${esc(b.branchName || '—')}</dd><dt>Routing/IFSC</dt><dd>${esc(b.ifscCode || '—')}</dd>` : ''}
+    <dt>Requested</dt><dd>${esc(fmtDate(w.date))}</dd><dt>Balance held</dt><dd>${w.held === true ? 'Yes — deducted at request' : 'No (legacy) — deducted at approval'}</dd>${w.processedAt ? `<dt>Processed</dt><dd>${esc(fmtDate(w.processedAt))}</dd>` : ''}${w.note ? `<dt>Note</dt><dd>${esc(w.note)}</dd>` : ''}</dl></div>`;
+    $('[data-cp]', body).onclick = () => copyText(w.number);
+    sh.foot.innerHTML = '';
+    if (st === 'pending') {
+      const note = h('<input class="in" id="wdNote" placeholder="Optional note to record (e.g. transaction ID)" style="flex:1;min-width:200px;padding:10px 13px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);color:var(--text);font:inherit">');
+      sh.foot.append(note, btn('Reject', 'danger', async () => { if (await ask({ title: 'Reject this request?', msg: w.held === true ? 'The held amount will be refunded to the user.' : 'No balance change (legacy request).', ok: 'Reject', danger: true })) { if (await processWd(w, 'rejected', note.value.trim())) sh.close(); } }, 'close'),
+        btn('Approve', 'ok', async () => { if (await ask({ title: 'Approve ' + money(w.amount) + '?', msg: 'Make sure you have paid ' + w.number + ' via ' + w.method + '.', ok: 'Approve' })) { if (await processWd(w, 'approved', note.value.trim())) sh.close(); } }, 'check'));
+      sh.foot.hidden = false;
+    } else sh.foot.hidden = true;
+  };
+  sh = openSheet({ title: 'Withdrawal request', body, onClose: () => offs.forEach(f => f()), footer: [h('<span></span>')] });
+  const offs = ['wd', 'users'].map(e => bus.on(e, render)); render();
+}
+async function processWd(w, status, note) {
+  const r = await db.ref('withdrawals/' + w._k + '/status').transaction(c => ((c || 'pending') === 'pending' ? status : undefined));
+  if (!r.committed) { toast('This request was already processed', 'bad'); return false; }
+  const amt = num(w.amount), uid = String(w.userId);
+  if (status === 'approved' && !w.held) {
+    const nb = await addBalance(uid, -amt, true);
+    if (nb === null) { await db.ref('withdrawals/' + w._k + '/status').set('pending'); toast('User has insufficient balance (legacy request) — kept pending', 'bad'); return false; }
+    await writeTx(uid, 'withdraw', amt, 'Withdrawal approved · ' + (w.method || ''));
+  }
+  if (status === 'rejected' && w.held === true) {
+    if (await addBalance(uid, amt) !== null) await writeTx(uid, 'refund', amt, 'Withdrawal rejected — refunded · ' + (w.method || ''));
+  }
+  await db.ref('withdrawals/' + w._k).update({ note: note || '', processedAt: new Date().toISOString(), processedBy: S.me ? S.me.email : '' });
+  toast('Request ' + status); return true;
+}
+
+/* ====================== TRANSACTIONS ====================== */
+function vTx(ctx) {
+  const el = ctx.el; let page = 0, f = { t: 'all', from: '', to: '', q: '' }; const PS = 25;
+  el.innerHTML = `<section class="card"><div class="blk-h"><h3>${ico('receipt_long')} Transaction log <span class="badge brand" id="tN">0</span></h3><div class="blk-a" id="tB"></div></div>
+  <div class="flt"><select id="tT"><option value="all">All types</option><option value="earn">Earnings</option><option value="withdraw">Withdrawals</option><option value="refund">Refunds</option><option value="admin">Admin adjustments</option></select><input type="date" id="tF" title="From"><input type="date" id="tTo" title="To"><input id="tQ" placeholder="Search user or description…"></div>
+  <div class="list" id="tL">${skeleton(5)}</div><div class="more" id="tP"></div></section>`;
+  const list = () => S.tx.filter(t => (f.t === 'all' || t.type === f.t) && (!f.from || dayKey(t.date) >= f.from) && (!f.to || dayKey(t.date) <= f.to) && (!f.q || [t.username, t.description, t.userId].some(x => String(x || '').toLowerCase().includes(f.q))));
+  $('#tB', el).appendChild(btn('Export CSV', 'ghost sm', () => download('transactions.csv', toCSV(list(), [{ label: 'ID', get: t => t._k }, { label: 'Date', get: t => t.date }, { label: 'User', get: t => t.username }, { label: 'UID', get: t => t.userId }, { label: 'Type', get: t => t.type }, { label: 'Amount', get: t => t.amount }, { label: 'Description', get: t => t.description }]), 'text/csv'), 'download'));
+  const draw = () => {
+    if (!S.loaded.tx) return; const a = list(), pages = Math.max(1, Math.ceil(a.length / PS)); if (page >= pages) page = pages - 1;
+    $('#tN', el).textContent = a.length; const L = $('#tL', el);
+    L.innerHTML = a.length ? a.slice(page * PS, page * PS + PS).map(t => { const neg = t.type === 'withdraw' || (t.type === 'admin' && num(t.delta) < 0); return `<div class="row"><div class="thumb">${ico(t.type === 'earn' ? 'add_circle' : t.type === 'withdraw' ? 'arrow_circle_up' : t.type === 'refund' ? 'undo' : 'manage_accounts')}</div><div class="mid"><b>${esc(t.description || t.type)}</b><small>${esc(t.username || userName(t.userId))} · ${esc(fmtShort(t.date))}</small></div><span class="badge">${esc(t.type)}</span><span class="${neg ? 'neg' : 'pos'}" style="min-width:74px;text-align:right">${neg ? '−' : '+'}${num(t.amount).toFixed(2)}</span></div>`; }).join('') : `<div class="empty">${ico('receipt_long')}${S.tx.length ? 'No transactions match these filters.' : 'No transactions recorded yet.'}</div>`;
+    const P = $('#tP', el); P.innerHTML = '';
+    if (pages > 1) { const pv = btn('Prev', 'ghost sm', () => { page--; draw(); }, 'chevron_left'), nx = btn('Next', 'ghost sm', () => { page++; draw(); }, 'chevron_right'); pv.disabled = page === 0; nx.disabled = page >= pages - 1; P.append(pv, h(`<span>Page ${page + 1} / ${pages}</span>`), nx); }
+  };
+    $('#tT', el).onchange = e => { f.t = e.target.value; page = 0; draw(); };
+  $('#tF', el).onchange = e => { f.from = e.target.value; page = 0; draw(); }; $('#tTo', el).onchange = e => { f.to = e.target.value; page = 0; draw(); };
+  $('#tQ', el).oninput = e => { f.q = e.target.value.trim().toLowerCase(); page = 0; draw(); };
+  ctx.sub('tx', draw); ctx.sub('users', draw); draw();
+}
+/* ====================== EARN / CONTENT PAGES ====================== */
+const ytId = u => { const m = String(u || '').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/); return m && m[1]; };
+const page = (ctx, intro, ...blocks) => { if (intro) ctx.el.appendChild(pageIntro(intro)); blocks.forEach(b => ctx.el.appendChild(b)); };
+const R = { reward: { key: 'reward', label: 'Reward (৳)', type: 'number', required: true, min: 0, half: true } };
+/* ---- per-item show / hide (field "enabled"; missing = visible) ---- */
+const VIS_PATHS = ['tasks', 'quizzes', 'videos', 'scratchImages', 'captchas', 'offers', 'surveys'];
+function withVis(cfg) {
+  if (!VIS_PATHS.includes(cfg.path) || cfg._vis) return cfg;
+  const c = Object.assign({}, cfg, { _vis: true }), hid = i => i.enabled === false, r0 = cfg.row;
+  const adsF = cfg.fields.some(f => f.key === 'ads') ? [] : [{ key: 'ads', label: 'Ads / embed code (optional)', type: 'textarea', rows: 3, hint: 'Shown to the user together with this ' + (cfg.singular || 'item') + '. Paste an ad-network script or HTML.' }];
+  c.fields = [...cfg.fields, ...adsF, { key: 'enabled', label: 'Visibility', type: 'switch', text: 'Show this ' + (cfg.singular || 'item') + ' to users', default: true }];
+  c.defaults = Object.assign({ enabled: true }, cfg.defaults || {});
+  c.row = i => { const o = r0(i); o.badge = [hid(i) ? 'hidden' : 'visible', hid(i) ? '' : 'ok']; return o; };
+  c.actions = [{ icon: 'visibility', label: 'Show / hide', fn: async i => { try { await db.ref(cfg.path + '/' + i._k).update({ enabled: hid(i) }); toast(hid(i) ? 'Now visible to users' : 'Hidden from users'); } catch (e) { fail(e, 'Could not update'); } } }, ...(cfg.actions || [])];
+  return c;
+}
+const mcq = (ctx, path, title, icon, singular) => crud(ctx, {
+  path, title, icon, singular, search: ['question'], empty: 'No ' + title.toLowerCase() + ' yet — users will see an empty state until you add some.',
+  defaults: { dailyLimit: 10 },
+  fields: [{ key: 'question', label: 'Question', type: 'textarea', rows: 3, required: true }, { key: 'options', correctKey: 'correct', label: 'Answer options', type: 'options', min: 2, max: 4 }, R.reward, { key: 'dailyLimit', label: 'Daily limit (per user)', type: 'number', int: true, min: 1, default: 10, half: true, hint: 'Users can earn from this many correct answers per day.' }],
+  row: i => ({ title: i.question, sub: `৳${num(i.reward)} · ${vals(i.options).length} options · ${num(i.dailyLimit) || 10}/day`, icon })
+});
+const linkCrud = (ctx, path, title, icon, singular) => crud(ctx, {
+  path, title, icon, singular, search: ['title', 'link'], desc: 'Users open the link, stay for the time you set on each item (default 15 seconds), then claim the reward.',
+  fields: [{ key: 'title', label: 'Title', type: 'text', required: true }, { key: 'link', label: 'Link', type: 'url', required: true, placeholder: 'https://…' }, { key: 'ads', label: 'Ads / embed code (optional)', type: 'textarea', rows: 3 }, R.reward, { key: 'watchSec', label: 'Time to stay on the link (seconds)', type: 'number', int: true, min: 0, default: 15, half: true, hint: 'The reward can be claimed only after this time. 0 = instantly.' }, { key: 'limit', label: 'Daily limit (0 = unlimited)', type: 'number', int: true, min: 0, half: true }],
+  row: i => ({ title: i.title, sub: `⏱ ${i.watchSec === undefined || i.watchSec === '' ? 15 : num(i.watchSec)}s · ৳${num(i.reward)} · ${num(i.limit) > 0 ? i.limit + '/day' : 'unlimited'} · ${i.link || ''}`, icon })
+});
+const limitForm = (ctx, path, title, icon, desc) => settings(ctx, { path, title, icon, desc, merge: true, fields: [{ key: 'limit', label: 'Daily limit per user', type: 'number', int: true, min: 0, default: 0, hint: '0 = unlimited' }] });
+const ghUrl = u => { const m = /^https?:\/\/(?:www\.)?github\.com\/([^\/\s]+)\/([^\/\s?#]+)\/?$/i.exec(String(u || '').trim()); return m ? 'https://' + m[1].toLowerCase() + '.github.io/' + m[2].replace(/\.git$/, '') + '/' : u; };
+const featFrame = (it, extra) => { const f = h(`<iframe class="fx" sandbox="allow-scripts allow-popups allow-forms allow-same-origin" allow="fullscreen" style="${extra || 'height:60vh'}"></iframe>`); if (it.type === 'link' && safeUrl(it.url)) f.src = safeUrl(it.url); else { f.setAttribute('sandbox', 'allow-scripts allow-popups allow-forms'); f.srcdoc = it.code || ''; } return f; };
+const previewFeature = it => { const f = featFrame(it); const body = h('<div></div>'); body.appendChild(f); if (it.type === 'link' && safeUrl(it.url)) body.appendChild(h(`<p style="margin-top:8px"><a href="${esc(safeUrl(it.url))}" target="_blank" rel="noopener">Open in new tab</a> · some sites block being shown inside a frame.</p>`)); openSheet({ title: it.name || 'Preview', body, wide: true }); };
+const featureCfg = (path, title, who) => ({ path, title, icon: 'widgets', singular: 'feature', search: ['name', 'url'], stamp: 'iso', desc: who, defaults: { type: 'html', icon: 'widgets', enabled: true }, fields: [{ key: 'name', label: 'Name', type: 'text', required: true, half: true }, { key: 'icon', label: 'Material icon name', type: 'text', default: 'widgets', half: true }, { key: 'type', label: 'Type', type: 'select', options: [['html', 'HTML / JS code'], ['link', 'Game / website link (GitHub Pages, Netlify…)']], default: 'html' }, { key: 'url', label: 'Link (for “Game / website link”)', type: 'url', placeholder: 'https://username.github.io/my-game/', hint: 'A github.com/user/repo link is converted to user.github.io/repo automatically — enable GitHub Pages on the repo first.' }, { key: 'code', label: 'HTML / JS code (for “HTML / JS code”)', type: 'textarea', rows: 8, hint: 'Runs in a sandboxed frame — it cannot access your session or data.' }, { key: 'enabled', label: 'Visible', type: 'switch', text: 'Show this feature to users', default: true }], prepare: d => { if (d.type === 'link') { d.url = ghUrl(d.url); if (!d.url) { toast('Enter the game / website link', 'bad'); return null; } } else if (!d.code) { toast('Enter the HTML / JS code', 'bad'); return null; } return d; }, row: i => ({ title: i.name, sub: i.type === 'link' ? (i.url || 'Link') : 'HTML widget', icon: i.icon || 'widgets', badge: [i.enabled === false ? 'hidden' : 'visible', i.enabled === false ? '' : 'ok'] }), actions: [{ icon: 'visibility', label: 'Preview', fn: previewFeature }, { icon: 'toggle_on', label: 'Show / hide', fn: i => db.ref(path + '/' + i._k).update({ enabled: i.enabled === false }) }] });
+
+const VIEWS = {
+  dashboard: vDash, users: vUsers, withdrawals: vWd, transactions: vTx,
+  tasks: ctx => page(ctx, 'Multiple-choice tasks users solve to earn coins.', mcq(ctx, 'tasks', 'Tasks', 'assignment', 'task')),
+  quiz: ctx => page(ctx, 'Quiz questions shown on the Quiz & Earn page.', mcq(ctx, 'quizzes', 'Quiz questions', 'quiz', 'question')),
+  spin: ctx => page(ctx, 'Each wheel segment is one reward. Add 0 for a "better luck next time" segment.', settings(ctx, { path: 'spinSettings', title: 'Spin wheel', icon: 'casino', fields: [{ key: 'rewards', label: 'Segment rewards (৳)', type: 'chips', allowZero: true, min: 2, hint: 'At least 2 segments.' }, { key: 'limit', label: 'Spins per user per day', type: 'number', int: true, min: 1, default: 3, required: true }], to: d => ({ rewards: d.rewards, limit: d.limit }) })),
+  videos: ctx => page(ctx, 'Users watch a random video; the timer only runs while it plays.', limitForm(ctx, 'gameSettings/video', 'Daily video limit', 'timer', 'How many videos one user may complete per day.'), settings(ctx, { path: 'gameSettings/videoRules', raw: true, title: 'Watch & Earn rules', icon: 'gavel', desc: 'Shown to users at the bottom of the Watch & Earn page. Write one rule per line. Leave empty and save to hide.', fields: [{ key: 'value', label: 'Rules', type: 'textarea', rows: 7, placeholder: 'Watch the video until the timer ends.\nDo not pause or close the app.' }] }), crud(ctx, {
+    path: 'videos', title: 'Videos', icon: 'smart_display', singular: 'video', search: ['title', 'url'], defaults: { type: 'youtube', watchTime: 1 },
+    fields: [{ key: 'type', label: 'Type', type: 'select', options: [['youtube', 'YouTube'], ['mp4', 'Direct video (mp4/webm)'], ['other', 'Other embeddable page']], default: 'youtube', half: true }, { key: 'title', label: 'Title', type: 'text', half: true }, { key: 'url', label: 'Video URL', type: 'url', required: true, placeholder: 'https://youtu.be/…' }, R.reward, { key: 'watchTime', label: 'Watch time (minutes)', type: 'number', min: 0.1, default: 1, required: true, half: true }],
+    prepare: d => { if (!d.title) d.title = d.type; return d; }, row: i => ({ title: i.title || i.url, sub: `৳${num(i.reward)} · ${num(i.watchTime)} min · ${i.type}`, thumb: ytId(i.url) ? 'https://img.youtube.com/vi/' + ytId(i.url) + '/mqdefault.jpg' : '', icon: 'smart_display' })
+  })),
+  scratch: ctx => page(ctx, 'A random image is hidden under the scratch layer; its reward is paid when revealed.', settings(ctx, { path: 'scratchDailyLimit', raw: true, title: 'Daily scratch limit', icon: 'timer', fields: [{ key: 'value', label: 'Scratches per user per day', type: 'number', int: true, min: 1, required: true, default: 5 }] }), crud(ctx, {
+    path: 'scratchImages', title: 'Scratch card images', icon: 'blur_on', singular: 'card', search: ['name'],
+    fields: [{ key: 'name', label: 'Name', type: 'text', required: true, half: true }, { key: 'reward', label: 'Reward (৳)', type: 'number', required: true, min: 0, half: true }, { key: 'url', label: 'Image URL', type: 'url', required: true, preview: true }],
+    row: i => ({ title: i.name, sub: '৳' + num(i.reward), thumb: i.url, icon: 'blur_on' })
+  })),
+  ttt: ctx => page(ctx, 'Users play against the computer. A win pays a random reward from your list.', settings(ctx, { path: 'gameSettings/ttt', merge: true, title: 'Tic Tac Toe', icon: 'grid_on', fields: [{ key: 'rewards', label: 'Win rewards (৳)', type: 'chips', min: 1, hint: 'One is picked at random on each win.' }, { key: 'limit', label: 'Games per user per day (0 = unlimited)', type: 'number', int: true, min: 0, default: 0, half: true }, { key: 'level', label: 'Computer difficulty', type: 'select', options: [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard (unbeatable)']], default: 'easy', half: true }] })),
+  captcha: ctx => page(ctx, 'The app shows only the captchas you add here — nothing is auto-generated. With none added, users see an empty state.', limitForm(ctx, 'gameSettings/captcha', 'Daily captcha limit', 'timer', 'How many captchas one user may solve per day.'), crud(ctx, {
+    path: 'captchas', title: 'Captchas', icon: 'security', singular: 'captcha', search: ['text'], empty: 'No captchas yet — the Captcha feature stays empty for users.',
+    fields: [{ key: 'text', label: 'Captcha text', type: 'text', required: true, maxlen: 16, hint: 'Letters/numbers users must type (case-insensitive).' }, { key: 'reward', label: 'Reward (৳)', type: 'number', required: true, min: 0 }],
+    row: i => ({ title: i.text, sub: '৳' + num(i.reward), icon: 'security' })
+  })),
+  offers: ctx => page(ctx, null, linkCrud(ctx, 'offers', 'Offers', 'local_offer', 'offer')),
+  surveys: ctx => page(ctx, null, linkCrud(ctx, 'surveys', 'Surveys', 'poll', 'survey')),
+  daily: ctx => page(ctx, 'Users can claim this once every 24 hours.', settings(ctx, { path: 'dailyBonus', raw: true, title: 'Daily check-in bonus', icon: 'event_available', fields: [{ key: 'value', label: 'Bonus per day (৳)', type: 'number', min: 0, required: true }] })),
+  signup: ctx => page(ctx, null, settings(ctx, { path: 'signupBonus', title: 'Signup bonus', icon: 'person_add', desc: 'Paid once to every new account.', from: v => (typeof v === 'number' ? { amount: v, enabled: true } : { amount: v && v.amount, enabled: v ? v.enabled !== false : true }), fields: [{ key: 'enabled', label: 'Enabled', type: 'switch', text: 'Give new users a bonus' }, { key: 'amount', label: 'Bonus amount (৳)', type: 'number', min: 0, required: true }], to: d => ({ amount: d.amount, enabled: d.enabled }) })),
+  referral: ctx => { page(ctx, null, settings(ctx, { path: 'referralSettings', merge: true, title: 'Referral program', icon: 'group_add', fields: [{ key: 'enabled', label: 'Signup option', type: 'switch', text: 'Allow referral codes at signup (and pay referral rewards)', default: true }, { key: 'showInApp', label: 'Invite visibility', type: 'switch', text: 'Show “Invite” in the app (Home button & All features)', default: true }, { key: 'commission', label: 'Commission for referrer (৳)', type: 'number', min: 0, required: true, half: true }, { key: 'bonus', label: 'Bonus for new user (৳)', type: 'number', min: 0, required: true, half: true }] })); vRefHist(ctx); },
+  banners: ctx => page(ctx, 'Shown as a sliding banner on the app home screen.', crud(ctx, { path: 'dashboardBanners', title: 'Home banners', icon: 'view_carousel', singular: 'banner', stamp: 'iso', search: ['link'], defaults: { enabled: true }, fields: [{ key: 'imageUrl', label: 'Image URL', type: 'url', required: true, preview: true }, { key: 'link', label: 'Click-through link (optional)', type: 'url' }, { key: 'enabled', label: 'Visible', type: 'switch', text: 'Show this banner', default: true }], row: i => ({ title: i.link || 'Banner', sub: fmtShort(i.date), thumb: i.imageUrl, badge: [i.enabled ? 'visible' : 'hidden', i.enabled ? 'ok' : ''], icon: 'image' }), actions: [{ icon: 'toggle_on', label: 'Toggle', fn: i => db.ref('dashboardBanners/' + i._k).update({ enabled: !i.enabled }) }] })),
+  popups: ctx => page(ctx, 'The newest enabled popup is shown to each user once per session.', crud(ctx, { path: 'popups', push: true, stamp: 'ms', title: 'Popups', icon: 'crop_free', singular: 'popup', search: ['title'], defaults: { enabled: true, autoClose: 5 }, sortFn: (a, b) => num(b.date) - num(a.date), fields: [{ key: 'title', label: 'Title', type: 'text', required: true }, { key: 'image', label: 'Image URL', type: 'url', required: true, preview: true }, { key: 'link', label: 'Button link (optional)', type: 'url' }, { key: 'autoClose', label: 'Auto-close after (seconds, 0 = manual)', type: 'number', int: true, min: 0, default: 5, half: true }, { key: 'enabled', label: 'Enabled', type: 'switch', text: 'Active', default: true, half: true }], row: i => ({ title: i.title, sub: 'auto-close ' + (num(i.autoClose) || 'off') + (num(i.autoClose) ? 's' : ''), thumb: i.image, badge: [i.enabled ? 'active' : 'off', i.enabled ? 'ok' : ''], icon: 'crop_free' }), actions: [{ icon: 'toggle_on', label: 'Toggle', fn: i => db.ref('popups/' + i._k).update({ enabled: !i.enabled }) }] })),
+  notifications: ctx => page(ctx, 'Broadcast messages appear in every user’s notification inbox.', crud(ctx, { path: 'notifications', title: 'Notifications', icon: 'notifications', singular: 'notification', stamp: 'iso', search: ['title', 'message'], fields: [{ key: 'title', label: 'Title', type: 'text', required: true }, { key: 'message', label: 'Message', type: 'textarea', rows: 5, required: true }], row: i => ({ title: i.title, sub: `${fmtShort(i.date)} · ${i.message || ''}`, icon: 'notifications' }) })),
+  notices: ctx => page(ctx, null, crud(ctx, { path: 'notices', title: 'Notice board', icon: 'campaign', singular: 'notice', stamp: 'iso', search: ['title', 'content'], fields: [{ key: 'title', label: 'Title', type: 'text', required: true }, { key: 'content', label: 'Content', type: 'textarea', rows: 6, required: true }], row: i => ({ title: i.title, sub: `${fmtShort(i.date)} · ${i.content || ''}`, icon: 'campaign' }) })),
+  social: ctx => page(ctx, null, crud(ctx, { path: 'socialLinks', title: 'Social links', icon: 'share', singular: 'link', search: ['name', 'url'], defaults: { platform: 'youtube', icon: 'link' }, fields: [{ key: 'platform', label: 'Platform', type: 'select', options: ['youtube', 'facebook', 'instagram', 'telegram', 'whatsapp', 'tiktok', 'twitter', 'linkedin', 'discord', 'pinterest', 'website', 'other'], half: true, hint: 'The logo is detected automatically from the URL.' }, { key: 'name', label: 'Display name', type: 'text', required: true, half: true }, { key: 'url', label: 'URL', type: 'url', required: true }, { key: 'icon', label: 'Material icon name', type: 'text', default: 'link', hint: 'e.g. play_arrow, send, language, link' }], row: i => ({ title: i.name, sub: `${i.platform} · ${i.url}`, icon: i.icon || 'link' }) })),
+  features: ctx => page(ctx, 'Add HTML code or a game / website link (e.g. GitHub Pages). It appears in the user app under Extras.', crud(ctx, featureCfg('customFeatures', 'Custom features', ''))),
+  widgets: ctx => { const c = crud(ctx, featureCfg('adminFeatures', 'Admin widgets', '')); const g = h(`<section class="card block"><div class="blk-h"><h3>${ico('dashboard_customize')} Live widgets</h3></div><div class="wgrid" id="wg"></div></section>`); ctx.listen('adminFeatures', s => { const w = $('#wg', g); w.innerHTML = ''; let n = 0; s.forEach(c => { const v = c.val(); if (!v) return; n++; const box = h(`<div><b style="display:block;margin-bottom:6px">${esc(v.name)}</b></div>`); box.appendChild(featFrame(v, '')); w.appendChild(box); }); if (!n) w.innerHTML = '<div class="empty" style="grid-column:1/-1">No widgets yet.</div>'; });
+    const x = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('widgets')} User Extras control</h3><p>Features added in “Custom features” — show or hide them for users, or test them live.</p></div></div><div class="list" id="xl"></div></section>`);
+    ctx.listen('customFeatures', s => { const L = $('#xl', x); L.innerHTML = ''; let n = 0; s.forEach(c => { const v = c.val(); if (!v) return; n++; const it = Object.assign({ _k: c.key }, v), on = it.enabled !== false; const row = h(`<div class="row"><div class="thumb">${ico(it.icon || 'widgets')}</div><div class="mid"><b>${esc(it.name || 'Feature')}</b><small>${esc(it.type === 'link' ? (it.url || 'Link') : 'HTML widget')}</small></div><span class="badge ${on ? 'ok' : ''}">${on ? 'visible' : 'hidden'}</span><div class="acts"></div></div>`); const A = $('.acts', row); const pv = h(`<button class="act" title="Test">${ico('play_arrow')}</button>`); pv.onclick = () => previewFeature(it); const tg = h(`<button class="act" title="${on ? 'Hide from users' : 'Show to users'}">${ico(on ? 'visibility_off' : 'visibility')}</button>`); tg.onclick = () => db.ref('customFeatures/' + c.key).update({ enabled: !on }).then(() => toast(on ? 'Hidden from users' : 'Visible to users')).catch(e => toast(e.message, 'bad')); A.append(pv, tg); L.appendChild(row); }); if (!n) L.innerHTML = '<div class="empty">No custom features yet — add one in “Custom features”.</div>'; });
+    page(ctx, 'Private HTML tools for yourself, plus live control of the Extras users see.', c, g, x); },
+  ads: ctx => page(ctx, 'Pasted code is injected into ad slots across the app.', settings(ctx, { path: 'adsCode', raw: true, title: 'Ads code', icon: 'ads_click', fields: [{ key: 'value', label: 'Ad HTML / script', type: 'textarea', rows: 8 }], buttons: [{ label: 'Clear ads', icon: 'delete', fn: async () => { if (await ask({ title: 'Remove ads code?', ok: 'Remove', danger: true })) { await db.ref('adsCode').remove(); toast('Ads cleared'); } } }] })),
+  music: ctx => page(ctx, null, settings(ctx, { path: 'musicUrl', title: 'Global background music', icon: 'music_note', desc: 'Always part of the shuffle. With the Music library below, users hear ALL tracks one after another in random order.', from: v => (v && typeof v === 'object' ? v : { url: typeof v === 'string' ? v : '' }), fields: [{ key: 'url', label: 'Audio URL (mp3)', type: 'url', required: true }, { key: 'name', label: 'Track name', type: 'text' }], to: d => ({ url: d.url, name: d.name || 'Music' }), buttons: [{ label: 'Remove music', icon: 'music_off', fn: async () => { await db.ref('musicUrl').remove(); toast('Music removed'); } }] }), crud(ctx, { path: 'customMusicList', push: true, title: 'Music library', icon: 'library_music', singular: 'track', search: ['name'], fields: [{ key: 'name', label: 'Name', type: 'text', required: true }, { key: 'url', label: 'Audio URL', type: 'url', required: true }], row: i => ({ title: i.name, sub: i.url, icon: 'music_note' }), actions: [{ icon: 'play_circle', label: 'Set as global music', fn: async i => { await db.ref('musicUrl').set({ url: i.url, name: i.name }); toast('Global music set: ' + i.name); } }] })),
+  about: ctx => page(ctx, null, settings(ctx, { path: 'aboutUs', title: 'About us', icon: 'info', fields: [{ key: 'title', label: 'Title', type: 'text', required: true }, { key: 'content', label: 'Content', type: 'textarea', rows: 7 }, { key: 'version', label: 'App version', type: 'text', half: true }, { key: 'contactEmail', label: 'Contact email', type: 'text', half: true }] })),
+  owner: ctx => page(ctx, null, settings(ctx, { path: 'aboutOwner', title: 'About owner', icon: 'badge', fields: [{ key: 'photo', label: 'Photo URL', type: 'url', preview: true }, { key: 'name', label: 'Name', type: 'text', required: true }, { key: 'bio', label: 'Bio', type: 'textarea', rows: 5 }] })),
+  developer: ctx => page(ctx, null, settings(ctx, { path: 'developerInfo', merge: true, title: 'Developer info', icon: 'code', fields: [{ key: 'hideBottom', label: 'Visibility', type: 'switch', text: 'Hide developer page from the app menu' }, { key: 'photo', label: 'Photo URL', type: 'url', preview: true }, { key: 'name', label: 'Name', type: 'text', required: true }, { key: 'bio', label: 'Bio', type: 'textarea', rows: 5 }, { key: 'contacts', label: 'Contacts', type: 'contacts' }] })),
+  methods: ctx => page(ctx, null, settings(ctx, { path: 'withdrawMinAmount', raw: true, title: 'Minimum withdrawal', icon: 'savings', fields: [{ key: 'value', label: 'Minimum amount (৳)', type: 'number', min: 0, required: true, default: 1000 }] }), crud(ctx, { path: 'withdrawMethods', title: 'Withdraw methods', icon: 'payments', singular: 'method', search: ['name'], defaults: { type: 'mobile', icon: 'payments' }, fields: [{ key: 'name', label: 'Method name', type: 'text', required: true, placeholder: 'bKash, Nagad, Bank…' }, { key: 'type', label: 'Type', type: 'select', options: [['mobile', 'Mobile wallet (number)'], ['bank', 'Bank account (details form)']], half: true }, { key: 'icon', label: 'Material icon name', type: 'text', default: 'payments', half: true }], prepare: d => { d.requiresBank = d.type === 'bank'; return d; }, row: i => ({ title: i.name, sub: i.type === 'bank' ? 'Bank transfer' : 'Mobile payment', icon: i.icon || 'payments', badge: [i.type || 'mobile', 'brand'] }) })),
+  support: vSupport, ai: vAI, settings: vSettings
+};
+function vRefHist(ctx) {
+  const b = h(`<section class="card block"><div class="blk-h"><h3>${ico('history')} Referral history</h3></div><div class="list" id="rh">${skeleton(2)}</div></section>`); ctx.el.appendChild(b);
+  const d = () => { if (!S.loaded.users) return; const a = []; S.users.forEach(u => refsOf(u).forEach(r => a.push({ by: u.username, who: r.username, c: r.commission, d: r.date }))); a.sort((x, y) => new Date(y.d) - new Date(x.d)); $('#rh', b).innerHTML = a.length ? a.slice(0, 100).map(r => `<div class="row"><div class="thumb">${ico('group_add')}</div><div class="mid"><b>${esc(r.who)} <small>joined via</small> ${esc(r.by)}</b><small>${esc(fmtShort(r.d))}</small></div><span class="pos">+${num(r.c).toFixed(2)}</span></div>`).join('') : `<div class="empty">${ico('group_add')}No referrals yet.</div>`; };
+  ctx.sub('users', d); d();
+}
+
+/* ====================== SUPPORT ====================== */
+function vSupport(ctx) {
+  const el = ctx.el; let cur = null, q = '', mOff = null;
+  el.innerHTML = `<div id="cs"></div><section class="card chat" id="ch"><div class="clist"><div class="search">${ico('search')}<input id="cq" placeholder="Search chats…"></div><div id="cl"></div></div><div class="cpane" id="cp"></div></section>`;
+  $('#cs', el).appendChild(settings(ctx, { path: 'supportSettings', merge: true, title: 'Chat settings', icon: 'tune', fields: [{ key: 'autoDeleteDays', label: 'Auto-delete chats after (days, 0 = never)', type: 'number', int: true, min: 0, default: 7, half: true }, { key: 'hideBottom', label: 'Visibility', type: 'switch', text: 'Hide Live Support from the app menu', half: true }] }));
+  const list = () => {
+    const L = $('#cl', el); const a = Object.entries(S.chats).filter(([id, c]) => !q || String(c.username || userName(id)).toLowerCase().includes(q)).sort((x, y) => num(y[1].lastUpdate) - num(x[1].lastUpdate));
+    L.innerHTML = a.length ? '' : `<div class="empty">${ico('forum')}${S.loaded.chats ? 'No conversations yet.' : 'Loading…'}</div>`;
+    a.forEach(([id, c]) => { const u = S.uMap[id]; const r = h(`<div class="ci ${cur === id ? 'on' : ''}">${avatarHtml(u || { username: c.username })}<div class="mid"><b><span>${esc(c.username || userName(id))}</span><em>${c.lastUpdate ? esc(fmtShort(c.lastUpdate)) : ''}</em></b><small>${esc(c.lastMessage || '')}</small></div>${num(c.unreadAdmin) > 0 ? `<span class="badge" style="background:var(--accent);color:#fff">${num(c.unreadAdmin)}</span>` : ''}</div>`); r.onclick = () => open(id); L.appendChild(r); });
+  };
+  function open(id) {
+    cur = id; if (mOff) mOff(); const c = S.chats[id] || {}, u = S.uMap[id]; $('#ch', el).classList.add('open'); list();
+    const P = $('#cp', el);
+    P.innerHTML = `<div class="ch"><button class="act back" id="bk">${ico('arrow_back')}</button>${avatarHtml(u || { username: c.username })}<div class="mid"><b>${esc(c.username || userName(id))}</b><small>UID ${esc(id)}</small></div><button class="act" id="ui" title="User details">${ico('person')}</button><button class="act del" id="cc" title="Clear chat">${ico('delete_sweep')}</button></div><div class="msgs" id="ms"></div><div class="edbar" id="eb" hidden><span id="ebT"></span><button class="act" id="ebX">${ico('close')}</button></div><div class="cin"><input id="ci" placeholder="Type a reply…" autocomplete="off"><button class="btn" id="cs2">${ico('send')}</button></div>`;
+    $('#bk', P).onclick = () => { cur = null; $('#ch', el).classList.remove('open'); list(); };
+    $('#ui', P).onclick = () => S.uMap[id] ? openUser(id) : toast('User no longer exists', 'bad');
+    $('#cc', P).onclick = async () => { if (await ask({ title: 'Clear this conversation?', msg: 'All messages will be deleted for both sides.', ok: 'Clear', danger: true })) { await db.ref('supportChats/' + id).remove(); cur = null; $('#ch', el).classList.remove('open'); $('#cp', el).innerHTML = ''; toast('Chat cleared'); } };
+    let msgs = [], ed = null, rp = null; const ref = db.ref('supportChats/' + id + '/messages'); const f = ref.on('value', s => {
+      msgs = []; s.forEach(x => { const v = x.val(); if (v) msgs.push(Object.assign({ _k: x.key }, v)); }); msgs.sort((a, b) => num(a.timestamp) - num(b.timestamp)); const box = $('#ms', P); if (!box) return;
+      const vis = msgs.filter(x => !x.hideAdmin);
+      box.innerHTML = vis.length ? vis.map(x => { const own = x.sender === 'admin'; return `<div class="msg ${own ? 'admin' : ''}${x.deleted ? ' del' : ''}" data-k="${esc(x._k)}"><span class="msg-m">${ico('expand_more')}</span>${(x.replyTo && !x.deleted) ? `<div class="qt"><b>${x.replyTo.sender === 'admin' ? 'You' : 'User'}</b><span>${esc(x.replyTo.text || '')}</span></div>` : ''}${x.deleted ? '🚫 ' + (own ? 'You deleted this message' : 'This message was deleted') : esc(x.text)}<small>${esc(fmtShort(x.timestamp))}${x.edited && !x.deleted ? ' · edited' : ''}</small></div>`; }).join('') : `<div class="empty">${ico('chat')}No messages.</div>`; box.scrollTop = box.scrollHeight;
+    }); mOff = () => ref.off('value', f);
+    db.ref('supportChats/' + id + '/unreadAdmin').set(0).catch(() => { });
+    const setBar = txt => { const b = $('#eb', P); if (!b) return; b.hidden = !txt; $('#ebT', P).textContent = txt || ''; };
+    const clearBar = () => { ed = null; rp = null; setBar(''); };
+    $('#ebX', P).onclick = () => { if (ed) $('#ci', P).value = ''; clearBar(); };
+    const send = async () => { const i = $('#ci', P), t = i.value.trim(); if (!t) return; i.value = ''; const ts = now(); const un = c.username || userName(id);
+      if (ed) { const k = ed; clearBar(); const m = msgs.find(x => x._k === k); if (!m || m.deleted) return; await db.ref('supportChats/' + id + '/messages/' + k).update({ text: t, edited: true, editedAt: ts }); const l = msgs[msgs.length - 1]; if (l && l._k === k) await db.ref('supportChats/' + id).update({ lastMessage: t }); return; }
+      const rpl = rp; clearBar();
+      await db.ref('supportChats/' + id + '/messages').push({ text: t, sender: 'admin', userId: isNaN(id) ? id : Number(id), username: 'Admin', timestamp: ts, ...(rpl ? { replyTo: rpl } : {}) });
+      await db.ref('supportChats/' + id).update({ lastMessage: t, lastUpdate: ts, username: un });
+      await db.ref('supportChats/' + id + '/unreadUser').transaction(v => num(v) + 1); };
+    $('#cs2', P).onclick = () => send().catch(e => fail(e, 'Send failed')); $('#ci', P).onkeydown = e => { if (e.key === 'Enter') send().catch(x => fail(x, 'Send failed')); };
+    const menu = m => {
+      const own = m.sender === 'admin', base = 'supportChats/' + id, mref = db.ref(base + '/messages/' + m._k); const last = msgs[msgs.length - 1], isLast = last && last._k === m._k;
+      const items = []; if (!m.deleted) { items.push(['reply', 'reply', 'Reply'], ['copy', 'content_copy', 'Copy']); if (own) items.push(['edit', 'edit', 'Edit']); }
+      items.push(['me', 'delete', 'Delete for me']); if (!m.deleted) items.push(['all', 'delete_forever', 'Delete for everyone']);
+      const body = h('<div></div>'); let w;
+      items.forEach(([k, ic, lb]) => { const r = h(`<button class="row" style="width:100%;text-align:left;cursor:pointer"><div class="thumb" ${k === 'all' ? 'style="color:#ff5252"' : ''}>${ico(ic)}</div><div class="mid"><b ${k === 'all' ? 'style="color:#ff5252"' : ''}>${lb}</b></div></button>`);
+        r.onclick = async () => { w.close(); try {
+          if (k === 'reply') { clearBar(); rp = { k: m._k, text: String(m.text || '').slice(0, 120), sender: own ? 'admin' : 'user' }; setBar('Replying to: ' + rp.text); $('#ci', P).focus(); }
+          else if (k === 'copy') { navigator.clipboard ? navigator.clipboard.writeText(m.text).then(() => toast('Copied')).catch(() => toast(m.text)) : toast(m.text); }
+          else if (k === 'edit') { clearBar(); ed = m._k; $('#ci', P).value = m.text; setBar('Editing message'); $('#ci', P).focus(); }
+          else if (k === 'me') { await mref.update({ hideAdmin: true }); }
+          else if (k === 'all') { if (!await ask({ title: 'Delete this message for everyone?', msg: 'The user will see “This message was deleted”.', ok: 'Delete', danger: true })) return; await mref.update({ deleted: true, text: '', deletedAt: now() }); if (isLast) await db.ref(base).update({ lastMessage: '🚫 Message deleted' }); toast('Message deleted'); }
+        } catch (e) { fail(e, 'Action failed'); } };
+        body.appendChild(r); });
+      w = openSheet({ title: 'Message', body });
+    };
+    $('#ms', P).onclick = e => { const b = e.target.closest('[data-k]'); if (!b) return; const m = msgs.find(x => x._k === b.dataset.k); if (m) menu(m); };
+    if (S.openChat === id) S.openChat = null; setTimeout(() => $('#ci', P) && $('#ci', P).focus(), 50);
+  }
+  $('#cq', el).oninput = e => { q = e.target.value.trim().toLowerCase(); list(); };
+  ctx.sub('chats', () => { list(); if (cur && num((S.chats[cur] || {}).unreadAdmin) > 0) db.ref('supportChats/' + cur + '/unreadAdmin').set(0).catch(() => { }); });
+  ctx.cleanup(() => mOff && mOff()); list(); if (S.openChat) open(S.openChat);
+}
+
+/* ====================== AI SUPPORT ====================== */
+const AI_PROV = {
+  openai: { name: 'OpenAI', c: '#10a37f', l: 'O', url: 'https://api.openai.com/v1', model: 'gpt-4o-mini', models: ['gpt-4o-mini', 'gpt-4o', 'gpt-4.1-mini', 'gpt-4.1'], key: 'https://platform.openai.com/api-keys' },
+  gemini: { name: 'Google Gemini', c: '#4285f4', l: 'G', url: 'https://generativelanguage.googleapis.com/v1beta', model: 'gemini-flash-latest', models: ['gemini-flash-latest', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'], key: 'https://aistudio.google.com/app/apikey' },
+  anthropic: { name: 'Anthropic Claude', c: '#d97757', l: 'A', url: 'https://api.anthropic.com/v1', model: 'claude-haiku-5-5', models: ['claude-haiku-5-5', 'claude-sonnet-5-5', 'claude-opus-5-5'], key: 'https://console.anthropic.com/settings/keys' },
+  groq: { name: 'Groq', c: '#f55036', l: 'Q', url: 'https://api.groq.com/openai/v1', model: 'llama-3.3-70b-versatile', models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'gemma2-9b-it'], key: 'https://console.groq.com/keys' },
+  openrouter: { name: 'OpenRouter', c: '#6467f2', l: 'R', url: 'https://openrouter.ai/api/v1', model: 'openai/gpt-4o-mini', models: ['openai/gpt-4o-mini', 'meta-llama/llama-3.3-70b-instruct:free', 'google/gemini-2.0-flash-001', 'deepseek/deepseek-chat'], key: 'https://openrouter.ai/keys' },
+  deepseek: { name: 'DeepSeek', c: '#4d6bfe', l: 'D', url: 'https://api.deepseek.com/v1', model: 'deepseek-chat', models: ['deepseek-chat', 'deepseek-reasoner'], key: 'https://platform.deepseek.com/api_keys' },
+  mistral: { name: 'Mistral', c: '#fa520f', l: 'M', url: 'https://api.mistral.ai/v1', model: 'mistral-small-latest', models: ['mistral-small-latest', 'mistral-large-latest'], key: 'https://console.mistral.ai/api-keys' },
+  xai: { name: 'xAI Grok', c: '#222', l: 'X', url: 'https://api.x.ai/v1', model: 'grok-2-latest', models: ['grok-2-latest', 'grok-beta'], key: 'https://console.x.ai' },
+  custom: { name: 'Custom', c: '#6c5ce7', l: '+', url: '', model: '', models: [], key: '' }
+};
+const aiDetect = k => /^sk-ant-/.test(k) ? 'anthropic' : /^sk-or-/.test(k) ? 'openrouter' : /^AIza/.test(k) ? 'gemini' : /^gsk_/.test(k) ? 'groq' : /^xai-/.test(k) ? 'xai' : /^sk-/.test(k) ? 'openai' : null;
+const aiBase = u => String(u || '').trim().replace(/\/+$/, '').replace(/\/(chat\/completions|messages)$/, '');
+async function fetchT(url, o, ms) {
+  if (!ms) return fetch(url, o);
+  const ctl = new AbortController(), id = setTimeout(() => ctl.abort(), ms);
+  try { return await fetch(url, Object.assign({}, o, { signal: ctl.signal })); }
+  catch (e) { if (e && e.name === 'AbortError') throw new Error('Timed out after ' + Math.round(ms / 1000) + 's'); throw e; }
+  finally { clearTimeout(id); }
+}
+async function aiRequest(c, system, msgs, maxTokens) {
+  const F = (u, o) => fetchT(u, o, c.timeoutMs);
+  const base = aiBase(c.apiUrl || (AI_PROV[c.provider] || {}).url);
+  const anth = c.provider === 'anthropic' || /api\.anthropic\.com/.test(base) || /^sk-ant-/.test(c.apiKey || '');
+  const gem = !anth && (c.provider === 'gemini' || /generativelanguage\.googleapis\.com/.test(base)); let r;
+  if (gem) {
+    const nb = base.replace(/\/openai$/, ''), mdl = String(c.model || '').replace(/^models\//, '');
+    const m = msgs.slice(); while (m.length && m[0].role !== 'user') m.shift();
+    r = await F(nb + '/models/' + encodeURIComponent(mdl) + ':generateContent?key=' + encodeURIComponent(c.apiKey), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ system_instruction: { parts: [{ text: system }] }, contents: m.map(x => ({ role: x.role === 'assistant' ? 'model' : 'user', parts: [{ text: x.content }] })), generationConfig: { maxOutputTokens: Math.max(maxTokens, 1024), temperature: .6 } }) });
+  } else if (anth) {
+    const m = msgs.slice(); while (m.length && m[0].role !== 'user') m.shift();
+    r = await F(base + '/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-api-key': c.apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify({ model: c.model, max_tokens: maxTokens, system, messages: m }) });
+  } else {
+    const newer = /^(o\d|gpt-5)/.test(c.model || '') && /api\.openai\.com/.test(base);
+    const body = { model: c.model, messages: [{ role: 'system', content: system }, ...msgs] };
+    if (newer) body.max_completion_tokens = maxTokens; else { body.max_tokens = maxTokens; body.temperature = .6; }
+    r = await F(base + '/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + c.apiKey }, body: JSON.stringify(body) });
+  }
+  const txt = await r.text(); let j = {}; try { j = JSON.parse(txt); } catch (e) { }
+  if (!r.ok) throw new Error('HTTP ' + r.status + ' — ' + ((j.error && (j.error.message || (typeof j.error === 'string' ? j.error : ''))) || j.message || txt.slice(0, 200)));
+  const a = gem ? (((j.candidates || [])[0] || {}).content && (j.candidates[0].content.parts || []).map(x => x.text || '').join('')) : anth ? (j.content || []).map(x => x.text || '').join('') : (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content);
+  if (!a) throw new Error('Unexpected response: ' + txt.slice(0, 200));
+  return a;
+}
+const GBASE = 'https://generativelanguage.googleapis.com/v1beta';
+function gemRank(m) {
+  const n = String(m.name || '').replace(/^models\//, '');
+  if (!/^gemini-/.test(n) || !(m.supportedGenerationMethods || []).includes('generateContent')) return -1;
+  if (/embedding|tts|image|live|audio|vision|robotics|computer-use|learnlm|aqa|exp|native|thinking/i.test(n)) return -1;
+  const v = parseFloat((/gemini-(\d+(?:\.\d+)?)/.exec(n) || [0, 0])[1]) || 0, tier = /flash-lite/.test(n) ? 1 : /flash/.test(n) ? 3 : /pro/.test(n) ? 2 : 0;
+  return v * 1000 + tier * 100 + (/preview/.test(n) ? 0 : 600) + (/-\d{3}$/.test(n) ? 0 : 5);   /* newest stable Flash wins: fast, cheap and generous free quota */
+}
+async function gemList(key) {
+  const r = await fetchT(GBASE + '/models?pageSize=200&key=' + encodeURIComponent(key), {}, 20000); const txt = await r.text(); let j = {}; try { j = JSON.parse(txt); } catch (e) { }
+  if (!r.ok) { const er = new Error((j.error && j.error.message) || ('HTTP ' + r.status)); er.status = r.status; throw er; }
+  return (j.models || []).map(m => ({ id: String(m.name).replace(/^models\//, ''), rank: gemRank(m) })).filter(m => m.rank >= 0).sort((a, b) => b.rank - a.rank);
+}
+function vAI(ctx) {
+  const st = { loaded: false, models: [] };
+  const card = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('smart_toy')} AI Support</h3><p>1) Paste your <b>Google API key</b> &nbsp; 2) Press Save. The best Gemini model is picked automatically — you can change it later.</p></div><span class="badge" id="aiSt">not set</span></div>
+    <div class="form">
+      <div class="fld"><label>Google API key <b>*</b></label><div class="eye"><input type="password" id="aiKey" autocomplete="off" placeholder="AIza…"><button type="button" id="aiEye">${ico('visibility')}</button></div><small class="muted" id="aiHint">Free key: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a></small></div>
+      <div class="fld"><label>Model</label><select id="aiModel"><option value="auto">✨ Automatic — best available</option></select><small class="muted" id="aiUsing">Chosen automatically when you press Save.</small></div>
+      <div class="fld"><div class="swrow"><label class="sw"><input type="checkbox" id="aiOn" checked><i></i></label><span>Show AI Support to users</span></div></div>
+      <div class="fld"><details><summary style="cursor:pointer;font-weight:600;font-size:13px">Advanced (optional)</summary><div class="form" style="margin-top:12px">
+        <div class="fld half"><label>Max tokens per reply</label><input type="number" id="aiMax" min="50" max="4000" value="500"></div>
+        <div class="fld"><label>Welcome message</label><input type="text" id="aiWelcome" placeholder="Hello! 👋 How can I help you today?"></div>
+        <div class="fld"><label>System prompt</label><textarea id="aiSys" rows="4" placeholder="Instructions for the assistant"></textarea></div></div></details></div>
+    </div>
+    <div class="note" style="margin:14px 0 0;padding:10px 12px;border-radius:12px;background:rgba(240,160,0,.12);font-size:12px">${ico('warning')} The key is stored in your database and the app calls Google directly, so users could extract it. Restrict the key in Google AI Studio or use a project with a low quota.</div>
+    <div class="acts" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px" id="aiBtns"></div>
+    <div class="code" id="aiOut" style="display:none;margin-top:12px"></div></section>`);
+  const q = s => $(s, card), SYS = 'You are a friendly support assistant for an earning app. Help users with tasks, quizzes, spin, withdrawals and referrals. Reply in the language the user writes in. Be concise.';
+  const out = q('#aiOut'), stt = q('#aiSt'), sel = q('#aiModel'); let saved = null;
+  const setSt = (txt, cls) => { stt.textContent = txt; stt.className = 'badge ' + (cls || ''); };
+  const log = (x, reset) => { out.style.display = 'block'; out.textContent = reset ? x : out.textContent + '\n' + x; out.scrollTop = out.scrollHeight; };
+  const status = e => e.status || +((/HTTP (\d+)/.exec(e.message || '') || [])[1]) || 0;
+  const fillModels = (models, current, mode) => {
+    st.models = models; const opts = ['<option value="auto">✨ Automatic — best available' + (models[0] ? ' (' + esc(models[0].id) + ')' : '') + '</option>'].concat(models.map((m, i) => `<option value="${esc(m.id)}">${esc(m.id)}${i === 0 ? '  ★ best' : ''}</option>`));
+    if (mode === 'manual' && current && !models.some(m => m.id === current)) opts.push(`<option value="${esc(current)}">${esc(current)}</option>`);
+    sel.innerHTML = opts.join(''); sel.value = mode === 'manual' ? current : 'auto';
+    q('#aiUsing').innerHTML = current ? 'Using: <b>' + esc(current) + '</b> (' + (mode === 'manual' ? 'chosen by you' : 'automatic') + ')' : '';
+  };
+  const cfgOf = (key, model) => ({ provider: 'gemini', apiUrl: GBASE, apiKey: key, model, timeoutMs: window.AI_PROBE_MS || 25000 });
+  const probe = (key, model, sys) => aiRequest(cfgOf(key, model), sys || 'You are a test.', [{ role: 'user', content: 'Reply with one short friendly sentence.' }], 60);
+  const common = () => ({ v2: true, enabled: q('#aiOn').checked, hideBottom: false, provider: 'gemini', apiUrl: GBASE, systemPrompt: q('#aiSys').value.trim() || SYS, welcomeMessage: q('#aiWelcome').value.trim() || 'Hello! 👋 How can I help you today?', maxTokens: Math.max(50, Math.min(4000, parseInt(q('#aiMax').value) || 500)) });
+  q('#aiEye').onclick = () => { const i = q('#aiKey'); i.type = i.type === 'password' ? 'text' : 'password'; };
+  const bt = q('#aiBtns');
+  const saveBtn = btn('Save', '', async () => {
+    const key = q('#aiKey').value.trim(); if (!key) return toast('Paste your Google API key first', 'bad');
+    saveBtn.disabled = true; log('Checking your key…', true); const mode = sel.value === 'auto' ? 'auto' : 'manual';
+    try {
+      let models, reached = true; try { models = await gemList(key); } catch (e) { if (status(e) && !(e instanceof TypeError)) throw e; reached = false; models = ['gemini-2.5-flash', 'gemini-2.0-flash'].map(id => ({ id })); log('(Could not read the model list — using common models)'); }
+      if (!models.length) throw new Error('This key has no usable Gemini model. Check that the Generative Language API is enabled for it.');
+      log('Key accepted ✓  Found ' + models.length + ' usable model' + (models.length > 1 ? 's' : '') + '. Best: ' + models[0].id);
+      /* the key is proven valid by Google → SAVE IT NOW, then verify which model answers */
+      const first = mode === 'manual' ? sel.value : models[0].id;
+      await db.ref('aiSupport').set(Object.assign(common(), { model: first, modelMode: mode, apiKey: key }));
+      fillModels(models.filter(m => m.rank !== undefined), first, mode); saved = { key, model: first, mode };
+      setSt(q('#aiOn').checked ? 'live' : 'hidden', q('#aiOn').checked ? 'ok' : ''); toast('API key saved' + (reached ? '' : ' (not verified)'));
+      log('✅ Saved. Now checking that the model replies…');
+      const cands = mode === 'manual' ? [{ id: sel.value }] : models.slice(0, 4); let win = null, reply = '', lastErr;
+      for (const m of cands) { log('Testing ' + m.id + ' …'); try { reply = await probe(key, m.id); win = m; break; } catch (e) { lastErr = e; if (status(e) === 429) { win = m; reply = '(key is valid, Google is rate-limiting right now)'; break; } log('  ✗ ' + String(e.message).slice(0, 140)); } }
+      if (win) { if (win.id !== first) { await db.ref('aiSupport').update({ model: win.id }); saved.model = win.id; fillModels(models.filter(m => m.rank !== undefined), win.id, mode); }
+        log('\n✅ Connected · ' + win.id + '\n' + reply + '\n\nAI Support is live for all users.'); }
+      else log('\n⚠️ The key is saved, but no model answered the test (' + String(lastErr && lastErr.message).slice(0, 140) + ').\nUsers will still try your key; you can pick another model from the dropdown or press “Test saved setup” later.');
+    } catch (e) { log('\n❌ ' + e.message + '\n\nNothing was saved. Check that the key is correct and that the Generative Language API is enabled for it.'); toast('Could not verify the key', 'bad'); }
+    saveBtn.disabled = false;
+  }, 'save');
+  bt.appendChild(saveBtn);
+  bt.appendChild(btn('Test saved setup', 'ghost', async () => {
+    const v = (await db.ref('aiSupport').once('value')).val(); if (!v || !v.apiKey) return toast('Nothing saved yet', 'bad');
+    log('Testing what users get…\nModel: ' + v.model + ' (' + (v.modelMode || 'auto') + ')\n', true);
+    try { log('✅ Works: ' + await probe(v.apiKey, v.model)); } catch (e) { log('❌ ' + e.message + (e instanceof TypeError ? ' (network/CORS)' : '')); }
+  }, 'science'));
+  bt.appendChild(btn('Remove AI', 'danger', async () => { if (!await ask({ title: 'Remove AI Support?', msg: 'The saved API key and settings will be deleted.', ok: 'Remove', danger: true })) return; await db.ref('aiSupport').remove(); q('#aiKey').value = ''; saved = null; fillModels([], '', 'auto'); setSt('not set'); toast('AI Support removed'); }, 'delete'));
+  /* change the model later */
+  sel.addEventListener('change', async () => {
+    if (!saved) { toast('Save your API key first', 'bad'); sel.value = 'auto'; return; }
+    const v = sel.value, mode = v === 'auto' ? 'auto' : 'manual', target = v === 'auto' ? (st.models[0] && st.models[0].id) : v; if (!target) return;
+    log('Switching to ' + target + ' …', true); sel.disabled = true;
+    try { await probe(saved.key, target); await db.ref('aiSupport').update({ model: target, modelMode: mode }); saved.model = target; saved.mode = mode; q('#aiUsing').innerHTML = 'Using: <b>' + esc(target) + '</b> (' + (mode === 'manual' ? 'chosen by you' : 'automatic') + ')'; log('✅ Model changed to ' + target); toast('Model changed'); }
+    catch (e) { log('❌ ' + e.message + '\nKept the previous model.'); toast('That model did not work', 'bad'); sel.value = saved.mode === 'manual' ? saved.model : 'auto'; }
+    sel.disabled = false;
+  });
+  /* show / hide switch saves instantly */
+  q('#aiOn').addEventListener('change', async e => { const on = e.target.checked; try { const v = (await db.ref('aiSupport').once('value')).val(); if (!v || !v.apiKey) { toast('Save your API key first', 'bad'); e.target.checked = !on; return; } await db.ref('aiSupport').update({ enabled: on, hideBottom: false }); setSt(on ? 'live' : 'hidden', on ? 'ok' : ''); toast(on ? 'AI Support is now visible to users' : 'AI Support is hidden from users'); } catch (err) { fail(err, 'Could not update'); e.target.checked = !on; } });
+  q('#aiSys').value = SYS;
+  ctx.listen('aiSupport', async s => {
+    if (st.loaded) return; st.loaded = true; const v = s.val(); if (!v || typeof v !== 'object') return;
+    if (!v.v2) { await db.ref('aiSupport').remove(); toast('Old AI setup cleared — paste your Google API key to start fresh'); return; }
+    q('#aiKey').value = v.apiKey || ''; q('#aiMax').value = v.maxTokens || 500; q('#aiOn').checked = v.enabled !== false; q('#aiSys').value = v.systemPrompt || SYS; q('#aiWelcome').value = v.welcomeMessage || '';
+    saved = { key: v.apiKey, model: v.model, mode: v.modelMode === 'manual' ? 'manual' : 'auto' }; fillModels([], v.model, saved.mode); setSt(v.enabled === false ? 'hidden' : 'live', v.enabled === false ? '' : 'ok');
+    try { const ms = await gemList(v.apiKey); fillModels(ms, v.model, saved.mode); } catch (e) { }
+  });
+  page(ctx, null, card);
+}
+
+/* ====================== SETTINGS ====================== */
+const BACKUP = ['users', 'transactions', 'withdrawals', 'tasks', 'quizzes', 'videos', 'spinSettings', 'scratchImages', 'scratchDailyLimit', 'gameSettings', 'captchas', 'offers', 'surveys', 'dailyBonus', 'signupBonus', 'referralSettings', 'socialLinks', 'dashboardBanners', 'popups', 'notifications', 'notices', 'customFeatures', 'adminFeatures', 'adsCode', 'appName', 'appSettings', 'musicUrl', 'customMusicList', 'aboutOwner', 'aboutUs', 'developerInfo', 'withdrawMethods', 'withdrawMinAmount', 'supportSettings', 'supportChats'];
+function imageCard(ctx, o) {
+  const c = h(`<section class="card block"><div class="blk-h"><div><h3>${ico(o.icon)} ${esc(o.title)}</h3><p>${esc(o.desc)}</p></div></div>
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap"><div class="ip" style="width:92px;height:92px;border-radius:${o.round ? '50%' : '26px'};background:var(--grad);display:grid;place-items:center;overflow:hidden;color:#fff;flex:none;font-weight:800;font-size:36px"></div><div class="ib" style="display:flex;gap:10px;flex-wrap:wrap"></div></div>
+    <div class="fld" style="margin-top:16px"><label>Or use an image link</label><div class="ir" style="display:flex;gap:8px;align-items:center"><input type="text" class="iu" placeholder="https://…/image.png" style="flex:1;min-width:0"></div></div>
+    <input type="file" class="if" accept="image/*" hidden></section>`);
+  const q = s => $(s, c), prev = q('.ip'); let del;
+  const show = v => { const ok = typeof v === 'string' && (v.startsWith('data:image/') || /^https:\/\//.test(v)); prev.innerHTML = ok ? `<img src="${esc(v)}" alt="" style="width:100%;height:100%;object-fit:${o.crop ? 'cover' : 'contain'}">` : o.fallback; if (del) del.style.display = ok ? '' : 'none'; if (ok && /^https:/.test(v)) q('.iu').value = v; };
+  const toImg = file => new Promise((res, rej) => { const fr = new FileReader(); fr.onerror = rej; fr.onload = () => { const im = new Image(); im.onerror = rej; im.onload = () => { let out = '';
+      if (o.crop) { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const k = Math.max(256 / im.width, 256 / im.height), w = im.width * k, hh = im.height * k; cv.getContext('2d').drawImage(im, (256 - w) / 2, (256 - hh) / 2, w, hh); out = cv.toDataURL('image/jpeg', .88); }
+      else { for (const sz of [256, 192, 144, 112]) { const k = Math.min(1, sz / Math.max(im.width, im.height)), cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(im.width * k)); cv.height = Math.max(1, Math.round(im.height * k)); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); out = cv.toDataURL('image/png'); if (out.length <= 90000) break; const w = cv.toDataURL('image/webp', .85); if (w.startsWith('data:image/webp') && w.length <= 90000) { out = w; break; } } }
+      out.length > 160000 ? rej(new Error('too big')) : res(out); }; im.src = fr.result; }; fr.readAsDataURL(file); });
+  const bt = q('.ib');
+  bt.appendChild(btn('Upload / change', '', () => q('.if').click(), 'upload'));
+  del = btn('Delete', 'danger', async () => { if (!await ask({ title: 'Delete this image?', msg: 'The default will be used instead.', ok: 'Delete', danger: true })) return; try { await db.ref(o.path).remove(); q('.iu').value = ''; toast('Image deleted'); } catch (e) { fail(e, 'Could not delete'); } }, 'delete');
+  bt.appendChild(del);
+  q('.ir').appendChild(btn('Use link', 'ghost', async () => { const v = q('.iu').value.trim(); if (!/^https:\/\/\S+$/i.test(v)) return toast('Enter a valid https:// image link', 'bad'); try { await db.ref(o.path).set(v); toast('Saved'); } catch (e) { fail(e, 'Could not save'); } }, 'link'));
+  q('.if').addEventListener('change', async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; if (!/^image\//.test(f.type)) return toast('Choose an image file', 'bad');
+    try { const d = await toImg(f); await db.ref(o.path).set(d); toast('Saved'); } catch (err) { toast(err.message === 'too big' ? 'This image is too detailed — use a simpler / smaller one' : 'Could not use this image', 'bad'); } });
+  ctx.listen(o.path, s => show(s.val()));
+  return c;
+}
+const logoCard = ctx => imageCard(ctx, { path: 'appSettings/launchLogo', icon: 'image', title: 'App logo (user app)', desc: 'Your app’s logo. It changes everywhere in the user app: launch animation, login screen, About page and the browser-tab icon. Upload, change or delete it any time. A square PNG with a transparent background looks best.', fallback: ico('paid') });
+const adminLogoCard = ctx => imageCard(ctx, { path: 'appSettings/adminLogo', icon: 'admin_panel_settings', title: 'Admin panel logo', desc: 'The logo of this admin panel — shown at the top of the side menu, on the admin login screen and as the browser-tab icon. Only the admin panel changes.', fallback: ico('admin_panel_settings') });
+const photoOpts = () => ({ path: 'appSettings/adminPhotos/' + S.me.id, icon: 'account_circle', title: 'Your profile photo', desc: 'Shown beside your Gmail (' + S.me.email + ') in the side menu. Upload, change or delete it any time.', round: true, crop: true, fallback: esc(initial(S.me.email)).toUpperCase() });
+const photoCard = ctx => imageCard(ctx, photoOpts());
+function applyAdminLogo(v) {
+  const ok = typeof v === 'string' && (v.startsWith('data:image/') || /^https:\/\//.test(v));
+  document.querySelectorAll('.brand .logo, #auth .logo').forEach(l => { l.innerHTML = ok ? `<img src="${esc(v)}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:inherit">` : '<span class="material-icons-round">admin_panel_settings</span>'; l.style.background = ok ? 'transparent' : ''; l.style.boxShadow = ok ? 'none' : ''; l.style.overflow = ok ? 'hidden' : ''; });
+  let ic = document.querySelector('link[rel="icon"][data-app]'); if (ok) { if (!ic) { ic = document.createElement('link'); ic.rel = 'icon'; ic.setAttribute('data-app', '1'); document.head.appendChild(ic); } ic.href = v; } else if (ic) ic.remove();
+  try { ok ? localStorage.setItem('ewi_adminlogo', v) : localStorage.removeItem('ewi_adminlogo'); } catch (e) { }
+}
+function setMeAvatar(v) { const el = $('#meAv'); if (!el || !S.me) return; const ok = typeof v === 'string' && (v.startsWith('data:image/') || /^https:\/\//.test(v)); el.innerHTML = ok ? `<img src="${esc(v)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">` : esc(initial(S.me.email)); }
+let _idOffs = [];
+function wireAdminIdentity() {
+  _idOffs.forEach(f => f()); _idOffs = [];
+  const r1 = db.ref('appSettings/adminLogo'), f1 = r1.on('value', s => applyAdminLogo(s.val()), () => { }); _idOffs.push(() => r1.off('value', f1));
+  const r2 = db.ref('appSettings/adminPhotos/' + S.me.id), f2 = r2.on('value', s => setMeAvatar(s.val()), () => { }); _idOffs.push(() => r2.off('value', f2));
+  const av = $('#meAv'); av.style.cursor = 'pointer'; av.title = 'Change profile photo';
+  av.onclick = () => { const ctx = newCtx(); openSheet({ title: 'Your profile photo', body: imageCard(ctx, photoOpts()), onClose: () => { ctx.dead = true; ctx.offs.forEach(f => f()); } }); };
+}
+function vSettings(ctx) {
+  const el = ctx.el;
+  el.appendChild(settings(ctx, { path: 'appName', raw: true, from: v => ({ value: (typeof v === 'string' && v.trim()) ? v : 'Earning With Ikhlas' }), title: 'User app name', icon: 'badge', desc: 'The name users see in their app: launch screen, login screen, browser title and the referral message. Delete it, type a new name and press Save — it changes instantly.', fields: [{ key: 'value', label: 'User app name', type: 'text', required: true, maxlen: 40 }] }));
+  el.appendChild(logoCard(ctx));
+  el.appendChild(adminLogoCard(ctx));
+  el.appendChild(photoCard(ctx));
+  el.appendChild(settings(ctx, { path: 'appSettings/adminName', raw: true, from: v => ({ value: (typeof v === 'string' && v.trim()) ? v : ($('#brandName') ? $('#brandName').textContent : 'Admin') }), title: 'Admin panel name', icon: 'admin_panel_settings', desc: 'The name shown at the top of this admin panel (side menu). Only you see it — it does not change the user app.', fields: [{ key: 'value', label: 'Admin panel name', type: 'text', required: true, maxlen: 40 }] }));
+  el.appendChild(settings(ctx, { path: 'appSettings', merge: true, title: 'Maintenance mode', icon: 'construction', desc: 'When on, users see your message instead of the app.', fields: [{ key: 'maintenance', label: 'Status', type: 'switch', text: 'Put the app in maintenance mode' }, { key: 'maintenanceMessage', label: 'Message', type: 'textarea', rows: 3, default: 'We are making improvements. Please check back soon.' }] }));
+  // appearance
+  const ap = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('palette')} Appearance</h3><p>Switch between light and dark mode.</p></div></div></section>`); ap.appendChild(btn('Toggle theme', 'ghost', () => toggleTheme(), 'contrast')); el.appendChild(ap);
+  // admins
+  const ad = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('admin_panel_settings')} Admin accounts</h3><p>Everyone listed here can log into this panel.</p></div></div><div class="list" id="al"></div><h4 style="margin:18px 0 10px">Add admin</h4><div id="af"></div></section>`);
+  const af = buildForm([{ key: 'email', label: 'Email', type: 'text', required: true, half: true }, { key: 'pw', label: 'Password (min 8)', type: 'secret', required: true, half: true }], {});
+  $('#af', ad).append(af.el, h('<div style="height:12px"></div>'), btn('Add admin', '', async () => {
+    let d; try { d = af.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
+    const em = d.email.toLowerCase(); if (!/^\S+@\S+\.\S+$/.test(em)) return toast('Enter a valid email', 'bad'); if (d.pw.length < 8) return toast('Password must be at least 8 characters', 'bad');
+    const all = (await db.ref('adminAuth').once('value')).val() || {}; if (Object.values(all).some(a => String(a.email).toLowerCase() === em)) return toast('That email is already an admin', 'bad');
+    const c = await makeCred(d.pw); await db.ref('adminAuth/' + rid()).set({ email: em, role: 'admin', createdAt: new Date().toISOString(), salt: c.salt, hash: c.hash, iter: c.iter }); toast('Admin added'); $$('input', af.el).forEach(i => i.value = '');
+  }, 'person_add'));
+  ctx.listen('adminAuth', s => { const L = $('#al', ad); L.innerHTML = ''; const owners = []; s.forEach(c => { if (c.val() && c.val().role === 'owner') owners.push(c.key); });
+    s.forEach(c => { const a = c.val(); if (!a) return; const me = c.key === S.me.id; const r = h(`<div class="row"><div class="av">${esc(initial(a.email))}</div><div class="mid"><b>${esc(a.email)} ${me ? '<span class="badge brand">you</span>' : ''}</b><small>${esc(a.role || 'admin')} · added ${esc(fmtShort(a.createdAt))}</small></div><div class="acts"></div></div>`); const A = $('.acts', r);
+      if (me) { const k = h(`<button class="act" title="Change my password">${ico('key')}</button>`); k.onclick = changeMyPw; A.appendChild(k); }
+      if (!me && !(a.role === 'owner' && owners.length < 2)) { const d = h(`<button class="act del" title="Remove">${ico('person_remove')}</button>`); d.onclick = async () => { if (await ask({ title: 'Remove ' + a.email + '?', msg: 'They will no longer be able to log in.', ok: 'Remove', danger: true })) { await db.ref('adminAuth/' + c.key).remove(); toast('Admin removed'); } }; A.appendChild(d); }
+      L.appendChild(r); }); });
+  el.appendChild(ad);
+  // backup
+  const bk = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('cloud_download')} Backup / export</h3><p>Download selected data as JSON. Passwords, credentials and API keys are never included.</p></div></div><div class="ck" id="ck">${BACKUP.map(k => `<label><input type="checkbox" value="${k}" ${['users', 'transactions', 'withdrawals', 'supportChats'].includes(k) && k === 'supportChats' ? '' : 'checked'}>${k}</label>`).join('')}</div><div class="blk-a" style="margin-top:14px"></div></section>`);
+  $('.blk-a', bk).append(btn('Download JSON', '', async () => {
+    const keys = $$('#ck input:checked', bk).map(i => i.value); if (!keys.length) return toast('Select at least one collection', 'bad'); const out = {};
+    for (const k of keys) { const v = (await db.ref(k).once('value')).val(); out[k] = v; }
+    if (out.users) Object.values(out.users).forEach(u => { if (u && typeof u === 'object') delete u.password; });
+    download('backup-' + dayKey(now()) + '.json', JSON.stringify({ exportedAt: new Date().toISOString(), data: out }, null, 2), 'application/json'); toast('Backup downloaded');
+  }, 'download'), btn('Select all', 'ghost', () => $$('#ck input', bk).forEach(i => i.checked = true)), btn('Select none', 'ghost', () => $$('#ck input', bk).forEach(i => i.checked = false)));
+  el.appendChild(bk);
+  // danger
+  const dz = h(`<section class="card block danger-z"><div class="blk-h"><div><h3 style="color:var(--bad)">${ico('warning')} Danger zone</h3><p>These actions cannot be undone.</p></div></div></section>`);
+  dz.appendChild(btn('Clear all support chats', 'danger', async () => { if (await ask({ title: 'Delete ALL support conversations?', msg: 'Every user chat will be permanently removed.', ok: 'Delete all', danger: true })) { await db.ref('supportChats').remove(); toast('All chats cleared'); } }, 'delete_sweep'));
+  el.appendChild(dz);
+}
+function changeMyPw() {
+  const f = buildForm([{ key: 'pw', label: 'New password (min 8)', type: 'secret', required: true }, { key: 'pw2', label: 'Confirm new password', type: 'secret', required: true }], {});
+  const go = btn('Update password', '', async () => {
+    let d; try { d = f.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
+    if (d.pw.length < 8) return toast('At least 8 characters', 'bad'); if (d.pw !== d.pw2) return toast('Passwords do not match', 'bad');
+    const c = await makeCred(d.pw); await db.ref('adminAuth/' + S.me.id).update({ salt: c.salt, hash: c.hash, iter: c.iter }); toast('Password updated'); sh.close();
+  }, 'key');
+  const sh = openSheet({ title: 'Change my password', body: f.el, footer: [btn('Cancel', 'ghost', () => sh.close()), go] });
+}
+
+/* ====================== NAV + ROUTER ====================== */
+/* ---- Earn feature visibility (stored in appSettings/earnHide/<id> = true when hidden) ---- */
+const EARN_FEATS = [['checkin', 'Daily check-in', 'event_available', 'daily'], ['spin', 'Spin wheel', 'casino', 'spin'], ['task', 'Tasks', 'assignment', 'tasks'], ['quiz', 'Quiz', 'quiz', 'quiz'], ['video', 'Watch & Earn (videos)', 'smart_display', 'videos'], ['scratch', 'Scratch cards', 'blur_on', 'scratch'], ['ttt', 'Tic Tac Toe', 'grid_on', 'ttt'], ['captcha', 'Captcha', 'security', 'captcha'], ['offers', 'Offers', 'local_offer', 'offers'], ['surveys', 'Surveys', 'poll', 'surveys']];
+const EARN_ROUTE = {}; EARN_FEATS.forEach(f => EARN_ROUTE[f[3]] = f);
+function earnSwitch(ctx, f, compact) {
+  const id = 'es_' + f[0] + (compact ? '_c' : '');
+  const row = h(`<div class="swrow" style="margin:0"><label class="sw"><input type="checkbox" id="${id}" checked><i></i></label><span><b>${esc(f[1])}</b> <small class="muted" data-st>visible to users</small></span></div>`);
+  const cb = $('input', row), st = $('[data-st]', row);
+  ctx.listen('appSettings/earnHide/' + f[0], s => { const hidden = s.val() === true; cb.checked = !hidden; st.textContent = hidden ? 'hidden from users' : 'visible to users'; st.style.color = hidden ? 'var(--bad,#ff5252)' : ''; });
+  cb.addEventListener('change', async () => { const on = cb.checked; try { await db.ref('appSettings/earnHide/' + f[0]).set(!on); toast(f[1] + (on ? ' is now visible to users' : ' is hidden from users')); } catch (e) { cb.checked = !on; fail(e, 'Could not update'); } });
+  return row;
+}
+const earnCard = (ctx, f) => { const c = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('visibility')} Visibility</h3><p>Hide or show “${esc(f[1])}” in the user’s Earn page. Takes effect instantly.</p></div></div></section>`); c.appendChild(earnSwitch(ctx, f, true)); return c; };
+/* ---- instant on/off cards: invert=true => stored value true means HIDDEN ; invert=false => stored value is the setting itself (default on) ---- */
+function flagCard(ctx, o) {
+  const c = h(`<section class="card block"><div class="blk-h"><div><h3>${ico(o.icon || 'visibility')} ${esc(o.title)}</h3><p>${esc(o.desc)}</p></div></div><div class="swrow" style="margin:0"><label class="sw"><input type="checkbox" checked><i></i></label><span><b>${esc(o.label)}</b> <small class="muted" data-st></small></span></div></section>`);
+  const cb = $('input', c), st = $('[data-st]', c), txt = on => on ? o.onText : o.offText;
+  ctx.listen(o.path, s => { const v = s.val(); const on = o.invert ? v !== true : (o.defOff ? v === true : v !== false); cb.checked = on; st.textContent = txt(on); st.style.color = on ? '' : 'var(--bad,#ff5252)'; });
+  cb.addEventListener('change', async () => { const on = cb.checked; try { await db.ref(o.path).set(o.invert ? !on : on); toast(txt(on)); } catch (e) { cb.checked = !on; fail(e, 'Could not update'); } });
+  return c;
+}
+const FEAT_ADS = { spin: 'spin', daily: 'checkin', ttt: 'ttt' };
+const SECTION_CARDS = {
+  about: [{ path: 'appSettings/hideSection/about', invert: true, icon: 'info', title: 'Visibility', desc: 'Show or hide “About” in the user’s All features list only. The ⋮ menu always keeps About. Takes effect instantly.', label: 'About in All features', onText: 'visible to users', offText: 'hidden from users' }],
+  methods: [{ path: 'appSettings/hideSection/withdraw', invert: true, icon: 'payments', title: 'Withdraw in All features', desc: 'Show or hide the “Withdraw” item in the user’s All features list only. The Wallet tab and the Home Withdraw button are not affected. Takes effect instantly.', label: 'Withdraw in All features', onText: 'visible to users', offText: 'hidden from users' }],
+  owner: [{ path: 'appSettings/hideSection/owner', invert: true, icon: 'badge', title: 'Visibility', desc: 'Show or hide “About owner” in the user app (All features). Takes effect instantly.', label: 'About owner', onText: 'visible to users', offText: 'hidden from users' }],
+  features: [{ path: 'appSettings/hideSection/extras', invert: true, icon: 'widgets', title: 'Visibility', desc: 'Show or hide the whole Extras feature in the user app (All features and the Home screen). Takes effect instantly.', label: 'Extras', onText: 'visible to users', offText: 'hidden from users' }],
+  tasks: [{ path: 'gameSettings/task/showCoin', invert: false, icon: 'paid', title: 'Reward coin', desc: 'Show or hide the reward amount (coin) on each task for users.', label: 'Reward coin', onText: 'shown to users', offText: 'hidden from users' }, { path: 'gameSettings/task/allowSkip', invert: false, icon: 'skip_next', title: 'Skip button', desc: 'Let users skip a task they do not want to answer.', label: 'Skip button', onText: 'shown to users', offText: 'hidden from users' }],
+  quiz: [{ path: 'gameSettings/quiz/showCoin', invert: false, icon: 'paid', title: 'Reward coin', desc: 'Show or hide the reward amount (coin) on each question for users.', label: 'Reward coin', onText: 'shown to users', offText: 'hidden from users' }, { path: 'gameSettings/quiz/allowSkip', invert: false, icon: 'skip_next', title: 'Skip button', desc: 'Let users skip a question they do not want to answer.', label: 'Skip button', onText: 'shown to users', offText: 'hidden from users' }]
+};
+VIEWS.wdgate = ctx => {
+  const TY = { link: 'Open a link (follow / join / visit)', rule: 'Read & accept a rule', earned: 'Earn a total amount', days: 'Account age (days)' };
+  const sw = flagCard(ctx, { path: 'appSettings/withdrawGate/enabled', invert: false, defOff: true, icon: 'verified_user', title: 'Require activation before withdrawing', desc: 'When ON, a user must complete every visible step below before they can request a withdrawal. When OFF, everyone can withdraw as usual. Turn it on or off whenever you like.', label: 'Withdraw activation', onText: 'ON — users must complete the steps', offText: 'OFF — everyone can withdraw' });
+  const sh = flagCard(ctx, { path: 'appSettings/withdrawGate/hidden', invert: true, icon: 'visibility', title: 'Show in the app', desc: 'Show or hide the “Withdraw Activation” item in the user’s All features list. (If activation is ON, users still see the lock notice in their Wallet.)', label: 'Show in All features', onText: 'visible to users', offText: 'hidden from users' });
+  const txt = settings(ctx, { path: 'appSettings/withdrawGate', merge: true, title: 'Text shown to users', icon: 'edit_note', desc: 'Optional. Leave empty to use the defaults.', fields: [{ key: 'title', label: 'Title', type: 'text', maxlen: 60, placeholder: 'Activate your withdrawal' }, { key: 'message', label: 'Message', type: 'textarea', rows: 3, placeholder: 'Complete the steps below to unlock withdrawals.' }] });
+  const steps = crud(ctx, { path: 'appSettings/withdrawSteps', push: true, title: 'Activation steps', icon: 'checklist', singular: 'step', search: ['title'], stamp: 'iso', defaults: { type: 'link', waitSec: 10, enabled: true },
+    desc: 'Add the rules / tasks users must complete. Every visible step must be done.',
+    fields: [{ key: 'title', label: 'Step title', type: 'text', required: true, maxlen: 80, placeholder: 'e.g. Join our Telegram channel' },
+      { key: 'type', label: 'Step type', type: 'select', options: Object.entries(TY), default: 'link' },
+      { key: 'description', label: 'Instruction / rule text', type: 'textarea', rows: 3, placeholder: 'What the user has to do' },
+      { key: 'url', label: 'Link (for “Open a link”)', type: 'url', placeholder: 'https://…' },
+      { key: 'waitSec', label: 'Seconds before “I’ve done it” unlocks (link steps)', type: 'number', min: 0, default: 10, half: true },
+      { key: 'target', label: 'Target (৳ for “Earn a total amount”, days for “Account age”)', type: 'number', min: 0, half: true },
+      { key: 'enabled', label: 'Visibility', type: 'switch', text: 'This step is active', default: true }],
+    prepare: d => { if (d.type === 'link' && !d.url) { toast('Enter the link for this step', 'bad'); return null; } if ((d.type === 'earned' || d.type === 'days') && !(num(d.target) > 0)) { toast('Enter the target amount / days', 'bad'); return null; } return d; },
+    row: i => ({ title: i.title, sub: (TY[i.type] || 'Step') + (i.type === 'link' && i.url ? ' · ' + i.url : '') + ((i.type === 'earned' || i.type === 'days') && i.target ? ' · ' + i.target : ''), icon: { link: 'open_in_new', rule: 'gavel', earned: 'paid', days: 'event' }[i.type] || 'task_alt', badge: [i.enabled === false ? 'hidden' : 'active', i.enabled === false ? '' : 'ok'] }),
+    actions: [{ icon: 'visibility', label: 'Turn on / off', fn: async i => { try { await db.ref('appSettings/withdrawSteps/' + i._k).update({ enabled: i.enabled === false }); toast(i.enabled === false ? 'Step is now active' : 'Step turned off'); } catch (e) { fail(e, 'Could not update'); } } }] });
+  page(ctx, 'Users must finish the steps you add here before they can withdraw. Switch the whole requirement on or off at any time.', sw, sh, txt, steps);
+};
+const ytIdOf = u => { u = String(u || '').trim(); const m = /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/))([\w-]{11})/.exec(u); return m ? m[1] : (/^[\w-]{11}$/.test(u) ? u : ''); };
+VIEWS.tutorial = ctx => {
+  const a1 = flagCard(ctx, { path: 'appSettings/hideSection/tutorial', invert: true, icon: 'apps', title: 'Show in All features', desc: 'Show or hide “Tutorial” in the user’s All features list.', label: 'Tutorial in All features', onText: 'visible to users', offText: 'hidden from users' });
+  const a2 = flagCard(ctx, { path: 'appSettings/hideSection/tutorialMenu', invert: true, icon: 'more_vert', title: 'Show in the ⋮ menu', desc: 'Show or hide “Tutorial” in the user’s top-right ⋮ menu.', label: 'Tutorial in ⋮ menu', onText: 'visible to users', offText: 'hidden from users' });
+  const list = crud(ctx, { path: 'appSettings/tutorials', push: true, title: 'Tutorial videos', icon: 'school', singular: 'tutorial', search: ['title', 'url'], stamp: 'iso', defaults: { enabled: true },
+    desc: 'Add YouTube videos that teach users how to use the app. Paste any YouTube link.',
+    fields: [{ key: 'title', label: 'Title', type: 'text', required: true, maxlen: 80, placeholder: 'e.g. How to withdraw' }, { key: 'url', label: 'YouTube link', type: 'url', required: true, placeholder: 'https://youtu.be/…' }, { key: 'description', label: 'Short description (optional)', type: 'textarea', rows: 3 }, { key: 'enabled', label: 'Visibility', type: 'switch', text: 'Show this video to users', default: true }],
+    prepare: d => { if (!ytIdOf(d.url)) { toast('That does not look like a YouTube link', 'bad'); return null; } return d; },
+    row: i => ({ title: i.title, sub: i.url, thumb: ytIdOf(i.url) ? 'https://img.youtube.com/vi/' + ytIdOf(i.url) + '/mqdefault.jpg' : '', icon: 'smart_display', badge: [i.enabled === false ? 'hidden' : 'visible', i.enabled === false ? '' : 'ok'] }),
+    actions: [{ icon: 'visibility', label: 'Show / hide', fn: async i => { try { await db.ref('appSettings/tutorials/' + i._k).update({ enabled: i.enabled === false }); toast(i.enabled === false ? 'Now visible to users' : 'Hidden from users'); } catch (e) { fail(e, 'Could not update'); } } }] });
+  page(ctx, 'A Tutorial section for your users, with YouTube videos you choose. Control where it appears below.', a1, a2, list);
+};
+const NAV = [
+  ['Overview', [['dashboard', 'Dashboard', 'space_dashboard'], ['users', 'Users', 'people'], ['withdrawals', 'Withdrawals', 'account_balance_wallet'], ['transactions', 'Transactions', 'receipt_long']]],
+  ['Earn features', [['tasks', 'Tasks', 'assignment'], ['quiz', 'Quiz', 'quiz'], ['spin', 'Spin wheel', 'casino'], ['videos', 'Videos', 'smart_display'], ['scratch', 'Scratch cards', 'blur_on'], ['ttt', 'Tic Tac Toe', 'grid_on'], ['captcha', 'Captcha', 'security'], ['offers', 'Offers', 'local_offer'], ['surveys', 'Surveys', 'poll'], ['daily', 'Daily bonus', 'event_available']]],
+  ['Growth', [['signup', 'Signup bonus', 'person_add'], ['referral', 'Referrals', 'group_add']]],
+  ['Content', [['banners', 'Home banners', 'view_carousel'], ['popups', 'Popups', 'crop_free'], ['notifications', 'Notifications', 'notifications'], ['notices', 'Notice board', 'campaign'], ['social', 'Social links', 'share'], ['tutorial', 'Tutorial videos', 'school'], ['features', 'Custom features', 'widgets'], ['widgets', 'Admin widgets', 'dashboard_customize'], ['ads', 'Ads code', 'ads_click'], ['music', 'Music', 'music_note'], ['about', 'About us', 'info'], ['owner', 'About owner', 'badge'], ['developer', 'Developer info', 'code']]],
+  ['Money', [['methods', 'Withdraw methods', 'payments'], ['wdgate', 'Withdraw activation', 'verified_user']]],
+  ['Support', [['support', 'Live chat', 'support_agent'], ['ai', 'AI support', 'smart_toy']]],
+  ['System', [['settings', 'Settings', 'settings']]]
+];
+const TITLES = {}; NAV.forEach(g => g[1].forEach(i => TITLES[i[0]] = i[1]));
+function buildNav() {
+  $('#nav').innerHTML = NAV.map(g => `<h6>${g[0]}</h6>` + g[1].map(i => `<a href="#/${i[0]}" data-r="${i[0]}">${ico(i[2])}<span>${i[1]}</span>${i[0] === 'withdrawals' || i[0] === 'support' ? `<span class="bdg" id="bd_${i[0]}" hidden></span>` : ''}</a>`).join('')).join('');
+  $$('#nav a').forEach(a => a.onclick = () => closeMenu());
+}
+function updBadges() {
+  const p = S.wd.filter(w => wdSt(w) === 'pending').length, u = Object.values(S.chats).reduce((a, c) => a + num(c.unreadAdmin), 0);
+  [['withdrawals', p], ['support', u]].forEach(([k, n]) => { const b = $('#bd_' + k); if (b) { b.hidden = !n; b.textContent = n > 99 ? '99+' : n; } });
+}
+bus.on('wd', updBadges); bus.on('chats', updBadges);
+function route() {
+  if (!S.me) return; killView();
+  let id = (location.hash.replace(/^#\/?/, '') || 'dashboard').split('?')[0]; if (!VIEWS[id]) id = 'dashboard';
+  $$('#nav a').forEach(a => a.classList.toggle('on', a.dataset.r === id)); $('#pageTitle').textContent = TITLES[id]; document.title = TITLES[id] + ' · Admin';
+  const ctx = newCtx(); curCtx = ctx; const v = $('#view'); v.innerHTML = ''; v.style.animation = 'none'; void v.offsetWidth; v.style.animation = '';
+  try { VIEWS[id](ctx); const top = []; if (EARN_ROUTE[id]) top.push(earnCard(ctx, EARN_ROUTE[id])); (SECTION_CARDS[id] || []).forEach(o => top.push(flagCard(ctx, o))); if (FEAT_ADS[id]) ctx.el.appendChild(settings(ctx, { path: 'gameSettings/' + FEAT_ADS[id], merge: true, title: 'Ads / embed code', icon: 'ads_click', desc: 'Optional. Shown at the bottom of this feature in the user app.', fields: [{ key: 'ads', label: 'Ads / embed code (optional)', type: 'textarea', rows: 4 }] })); top.reverse().forEach(c => ctx.el.insertBefore(c, ctx.el.firstChild)); } catch (e) { console.error(e); ctx.el.innerHTML = `<div class="note bad">${ico('error')}<div>This page failed to load: ${esc(e.message)}</div></div>`; }
+  v.appendChild(ctx.el); updBadges(); window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+const closeMenu = () => { $('#side').classList.remove('open'); $('#scrim').classList.remove('on'); };
+$('#menuBtn').onclick = () => { $('#side').classList.add('open'); $('#scrim').classList.add('on'); };
+$('#scrim').onclick = closeMenu;
+$('#logoutBtn').onclick = logout;
+function toggleTheme() { const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); try { localStorage.setItem('ewi_admin_theme', t); } catch (e) { } $('#themeBtn').innerHTML = ico(t === 'dark' ? 'light_mode' : 'dark_mode'); }
+$('#themeBtn').innerHTML = ico(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light_mode' : 'dark_mode'); $('#themeBtn').onclick = toggleTheme;
+window.addEventListener('unhandledrejection', e => { console.error(e.reason); });
+if (db) { let an = null, un = null; const applyBrand = () => { const n = (typeof an === 'string' && an.trim()) ? an : (typeof un === 'string' && un.trim()) ? un : 'Admin'; $('#brandName').textContent = n; };
+  db.ref('appSettings/adminName').on('value', s => { an = s.val(); applyBrand(); }, () => { });   /* own name for the admin panel; until you set it, the user app name is used as before */
+  db.ref('appName').on('value', s => { un = s.val(); applyBrand(); }, () => { }); }
+boot();
+</script>
+</body>
+</html>
