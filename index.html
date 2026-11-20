@@ -6,11 +6,16 @@
 <meta name="robots" content="noindex,nofollow">
 <title>Admin Panel</title>
 <script>(function(){try{var t=localStorage.getItem('ewi_admin_theme');if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','light')}})()</script>
+<style>html{background:#f3f4fb}html[data-theme=dark]{background:#0c0e24}</style>
+<script>(function(){try{var l=localStorage.getItem('ewi_adminlogo');if(l&&/^https:/.test(l)){var k=document.createElement('link');k.rel='preload';k.as='image';k.href=l;document.head.appendChild(k)}}catch(e){}})()</script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" crossorigin="anonymous">
+<link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js" crossorigin="anonymous">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" crossorigin="anonymous"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js" crossorigin="anonymous"></script>
+<script>(function(){var d=document.documentElement,ok=function(){d.classList.add("icons-ok")};try{if(document.fonts&&document.fonts.load){Promise.race([document.fonts.load('24px "Material Icons Round"'),new Promise(function(r){setTimeout(r,3000)})]).then(ok,ok)}else ok()}catch(e){ok()}setTimeout(ok,3500)})()</script>
 <style>
 :root{--brand:#6c5ce7;--brand2:#00c2ff;--accent:#ff4d8d;--gold:#ffc83d;--ok:#12b886;--warn:#f59f00;--bad:#f03e3e;
 --bg:#f3f4fb;--card:#ffffff;--text:#161a3a;--muted:#6b7099;--line:#e6e8f5;--soft:#f6f7fd;--shadow:0 6px 24px rgba(40,44,110,.08);
@@ -110,6 +115,7 @@ small,.muted{color:var(--muted)}
 .optrow{display:flex;gap:9px;align-items:center;margin-bottom:8px}.optrow input[type=radio]{accent-color:var(--ok);width:18px;height:18px;flex:none}
 .optrow .tag{font-weight:700;color:var(--muted);width:18px}
 .imgprev{margin-top:8px;border-radius:14px;overflow:hidden;background:var(--soft);border:1px dashed var(--line);display:none;max-height:170px}.imgprev img{display:block;width:100%;max-height:170px;object-fit:contain}.imgprev.on{display:block}
+.pzbox{max-height:none!important;margin-top:0!important;aspect-ratio:16/10;position:relative;display:grid!important;place-items:center}.pzbox img{position:absolute;inset:0;height:100%!important;max-height:none!important;object-fit:cover!important}.pzph{display:grid;justify-items:center;gap:4px;color:var(--muted)}.pzph .material-icons-round{font-size:38px;opacity:.6}
 .crow{display:grid;grid-template-columns:120px 1fr 1.4fr auto;gap:8px;margin-bottom:8px}
 @media(max-width:560px){.crow{grid-template-columns:1fr 1fr}.crow>*:nth-child(3){grid-column:1/-1}}
 .eye{position:relative}.eye button{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--muted)}.eye input{padding-right:42px!important}
@@ -122,6 +128,7 @@ small,.muted{color:var(--muted)}
 .row .thumb img{width:100%;height:100%;object-fit:cover}
 .row .mid{flex:1;min-width:0}.row .mid b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row .mid small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .acts{display:flex;gap:6px;flex:none}
+.row.vrow{flex-wrap:wrap}.row.vrow .mid{flex:1 1 200px}.row.vrow .mid b,.row.vrow .mid small{white-space:normal}.row.vrow .acts{width:100%;justify-content:flex-end}
 .act{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--soft);border:1px solid var(--line);transition:.2s}.act:hover{background:var(--brand);color:#fff;border-color:var(--brand)}.act.del:hover{background:var(--bad);border-color:var(--bad)}
 .empty{text-align:center;color:var(--muted);padding:34px 10px}.empty .material-icons-round{font-size:42px;opacity:.5;display:block;margin:0 auto 6px}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:700;background:var(--soft);color:var(--muted);white-space:nowrap}
@@ -194,10 +201,13 @@ iframe.fx{width:100%;border:1px solid var(--line);border-radius:14px;background:
 .code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:var(--soft);border-radius:12px;padding:12px;white-space:pre-wrap;word-break:break-word;max-height:240px;overflow:auto}
 .ck{display:flex;flex-wrap:wrap;gap:8px}.ck label{display:flex;gap:7px;align-items:center;padding:7px 12px;border-radius:99px;background:var(--soft);border:1px solid var(--line);cursor:pointer;font-size:12.5px}.ck input{accent-color:var(--brand)}
 .danger-z{border-color:rgba(240,62,62,.4)}
+html:not(.icons-ok) .mi,html:not(.icons-ok) .material-icons-round{visibility:hidden}
 </style>
 </head>
 <body>
 <div id="boot" class="boot"><div class="spin"></div></div>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js" crossorigin="anonymous"></script>
 <div id="auth" class="auth" hidden></div>
 <div id="app" class="app" hidden>
   <aside id="side" class="side">
@@ -390,6 +400,7 @@ function startGlobal() {
   on('users', s => { const a = []; const m = {}; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') { const u = Object.assign({ _k: c.key }, v); a.push(u); m[c.key] = u; } }); S.users = a; S.uMap = m; S.loaded.users = 1; emitSoon('users'); });
   on('transactions', s => { const a = []; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') a.push(Object.assign({ _k: c.key }, v)); }); a.sort((x, y) => new Date(y.date) - new Date(x.date)); S.tx = a; S.loaded.tx = 1; emitSoon('tx'); });
   on('withdrawals', s => { const a = []; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') a.push(Object.assign({ _k: c.key }, v)); }); a.sort((x, y) => new Date(y.date) - new Date(x.date)); S.wd = a; S.loaded.wd = 1; emitSoon('wd'); });
+  on('vipOrders', s => { const x = []; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') x.push(Object.assign({ _k: c.key }, v)); }); x.sort((p, q) => new Date(q.date) - new Date(p.date)); S.vo = x; S.loaded.vo = 1; emitSoon('vo'); });
   on('supportChats', s => { const o = {}; s.forEach(c => { const v = c.val(); if (v && typeof v === 'object') { const x = Object.assign({}, v); delete x.messages; x._n = v.messages ? Object.keys(v.messages).length : 0; o[c.key] = x; } }); S.chats = o; S.loaded.chats = 1; emitSoon('chats'); if (!S.autoDone) { S.autoDone = 1; autoDeleteChats(); } });
   const beat = () => db.ref('presence/admin').set(now()).catch(() => { });
   beat(); const iv = setInterval(beat, 45000); globalOffs.push(() => clearInterval(iv));
@@ -494,6 +505,7 @@ async function tryLegacy(e, p) {
 }
 function enterApp(id, rec) {
   S.me = Object.assign({ id }, rec);
+  try { const c = localStorage.getItem('ewi_adminlogo'); if (c) applyAdminLogo(c); const n = localStorage.getItem('ewi_adminname'); if (n) $('#brandName').textContent = n; } catch (e) { }
   $('#auth').hidden = true; $('#boot').hidden = true; $('#app').hidden = false;
   $('#meMail').textContent = rec.email; $('#meRole').textContent = rec.role || 'admin'; $('#meAv').textContent = initial(rec.email);
   wireAdminIdentity();
@@ -562,6 +574,36 @@ function buildForm(fields, data = {}) {
           return v;
         }; break;
       }
+      case 'image': {
+        /* photo field: upload from device (auto-compressed, stored inline) or paste an https link */
+        const okImg = v => typeof v === 'string' && (v.startsWith('data:image/') || /^https:\/\/\S+$/i.test(v));
+        let cur = okImg(val) ? val : '';
+        const w = h(`<div class="imgfld"><div class="imgprev on pzbox"><img alt=""><span class="pzph">${ico('add_photo_alternate')}<small>No photo yet</small></span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"></div><input type="text" placeholder="Or paste an https:// image link" style="width:100%"><input type="file" accept="image/*" hidden></div>`);
+        const im = $('img', w), ph = $('.pzph', w), url = $('input[type=text]', w), file = $('input[type=file]', w), bx = $('.pzbox', w), bar = $('div:nth-of-type(2)', w);
+        const paint = () => { if (cur) { im.src = cur; im.style.display = ''; ph.style.display = 'none'; } else { im.removeAttribute('src'); im.style.display = 'none'; ph.style.display = ''; } };
+        const compress = fl => new Promise((res, rej) => { const fr = new FileReader(); fr.onerror = rej; fr.onload = () => { const i = new Image(); i.onerror = rej; i.onload = () => {
+          const max = f.maxDim || 800; let out = '';
+          for (const [dim, q] of [[max, .8], [max, .68], [Math.round(max * .8), .62], [Math.round(max * .64), .55]]) { const k = Math.min(1, dim / Math.max(i.width, i.height)), cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(i.width * k)); cv.height = Math.max(1, Math.round(i.height * k)); cv.getContext('2d').drawImage(i, 0, 0, cv.width, cv.height); out = cv.toDataURL('image/jpeg', q); if (out.length <= 110000) break; }
+          out.length > 260000 ? rej(new Error('big')) : res(out); }; i.src = fr.result; }; fr.readAsDataURL(fl); });
+        const up = btn('Upload photo', '', () => file.click(), 'upload'); const rm = btn('Remove', 'ghost sm', () => { cur = ''; url.value = ''; paint(); }, 'delete');
+        bar.append(up, rm);
+        file.onchange = async () => { const fl = file.files[0]; file.value = ''; if (!fl) return; if (!/^image\//.test(fl.type)) return toast('Choose an image file', 'bad'); try { cur = await compress(fl); url.value = ''; paint(); } catch (e) { toast(e.message === 'big' ? 'This photo is too large — use a smaller one' : 'Could not read this photo', 'bad'); } };
+        url.oninput = () => { const v = url.value.trim(); if (okImg(v)) { cur = v; paint(); } };
+        if (/^https:/.test(cur)) url.value = cur;
+        im.onerror = () => { im.style.display = 'none'; ph.style.display = ''; };
+        paint(); ctl.appendChild(w);
+        get = () => { const v = url.value.trim(); if (v && okImg(v)) cur = v; if (f.required && !cur) bad(f.label + ' is required — upload a photo or paste a link'); return cur; }; break;
+      }
+      case 'checks': {
+        /* multi-select of fixed choices (stored as an array of numbers) */
+        let sel = (Array.isArray(val) ? val : vals(val)).map(Number).filter(n => isFinite(n));
+        const w = h('<div style="display:flex;flex-wrap:wrap;gap:8px"></div>');
+        (f.options || []).forEach(o => { const [v, l] = Array.isArray(o) ? o : [o, o]; const b = h(`<button type="button" class="chip" style="cursor:pointer;padding:8px 15px;border:1.5px solid var(--line);font-size:13px">${esc(l)}</button>`);
+          const sync = () => { const on = sel.includes(+v); b.style.background = on ? 'var(--brand)' : ''; b.style.color = on ? '#fff' : ''; b.style.borderColor = on ? 'var(--brand)' : ''; };
+          b.onclick = () => { const n = +v; sel = sel.includes(n) ? sel.filter(x => x !== n) : [...sel, n]; sync(); }; sync(); w.appendChild(b); });
+        ctl.appendChild(w);
+        get = () => { const out = [...new Set(sel)].sort((a, b) => a - b); if (out.length < (f.min || 1)) bad('Select at least ' + (f.min || 1) + ' option(s)'); return out; }; break;
+      }
       case 'options': {
         const max = f.max || 4, min = f.min || 2; const opts = Array.isArray(val) ? val.slice() : []; let correct = num(data[f.correctKey]) || 1;
         const w = h('<div></div>'); const gid = 'c' + Math.random().toString(36).slice(2);
@@ -582,7 +624,11 @@ function buildForm(fields, data = {}) {
         let list = (Array.isArray(val) ? val : vals(val)).map(Number).filter(n => isFinite(n));
         const box = h('<div class="chips"></div>'); const row = h(`<div class="chiprow"><input type="number" step="any" placeholder="${esc(f.placeholder || 'Amount')}" style="flex:1;padding:10px 13px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);color:var(--text);font:inherit"></div>`);
         const inp = $('input', row); const add = btn('Add', 'ghost sm', null, 'add'); row.appendChild(add);
-        const draw = () => { box.innerHTML = list.length ? '' : '<small class="muted">Nothing added yet.</small>'; list.forEach((n, i) => { const c = h(`<span class="chip">${n === 0 ? '0 (no win)' : '৳' + n}<button type="button">${ico('close')}</button></span>`); $('button', c).onclick = () => { list.splice(i, 1); draw(); }; box.appendChild(c); }); };
+        const label = n => (n === 0 ? '0 (no win)' : '৳' + n);
+        const edit = (i, c) => { c.innerHTML = `<input type="number" step="any" value="${list[i]}" style="width:80px;padding:3px 7px;border-radius:8px;border:1.5px solid var(--brand);background:var(--soft);color:var(--text);font:inherit;font-size:12.5px"><button type="button" data-ok>${ico('check')}</button><button type="button" data-no>${ico('close')}</button>`;
+          const e = $('input', c); e.focus(); e.select(); const ok = () => { const v = parseFloat(e.value); if (!isFinite(v) || v < 0 || (v === 0 && !f.allowZero)) return toast(f.allowZero ? 'Enter 0 or a positive amount' : 'Enter an amount greater than 0', 'bad'); list[i] = v; draw(); };
+          $('[data-ok]', c).onclick = ok; $('[data-no]', c).onclick = () => draw(); e.onkeydown = ev => { if (ev.key === 'Enter') { ev.preventDefault(); ok(); } else if (ev.key === 'Escape') draw(); }; };
+        const draw = () => { box.innerHTML = list.length ? '' : '<small class="muted">Nothing added yet.</small>'; list.forEach((n, i) => { const c = h(`<span class="chip" title="Tap to edit" style="cursor:pointer"><span class="cv">${label(n)}</span><button type="button" data-x>${ico('close')}</button></span>`); $('[data-x]', c).onclick = ev => { ev.stopPropagation(); list.splice(i, 1); draw(); }; $('.cv', c).onclick = () => edit(i, c); box.appendChild(c); }); };
         const doAdd = () => { const n = parseFloat(inp.value); if (!isFinite(n) || n < 0 || (n === 0 && !f.allowZero)) return toast(f.allowZero ? 'Enter 0 or a positive amount' : 'Enter an amount greater than 0', 'bad'); list.push(n); inp.value = ''; draw(); inp.focus(); };
         add.onclick = doAdd; inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); doAdd(); } };
         ctl.append(box, row); draw();
@@ -628,7 +674,7 @@ function crud(ctx, cfg) {
     L.innerHTML = '';
     f.forEach(it => {
       const r = cfg.row(it);
-      const row = h(`<div class="row"><div class="thumb">${r.thumb && safeUrl(r.thumb) ? `<img src="${esc(safeUrl(r.thumb))}" alt="" loading="lazy">` : ico(r.icon || cfg.icon || 'label')}</div><div class="mid"><b>${esc(r.title || '—')}</b><small>${esc(r.sub || '')}</small></div>${r.badge ? `<span class="badge ${r.badge[1] || ''}">${esc(r.badge[0])}</span>` : ''}<div class="acts"></div></div>`);
+      const row = h(`<div class="row"><div class="thumb"${r.logo ? ` style="background:${r.logo.bg};color:#fff"` : ''}>${r.logo ? r.logo.html : r.thumb && (safeUrl(r.thumb) || /^data:image\//.test(r.thumb)) ? `<img src="${esc(safeUrl(r.thumb) || r.thumb)}" alt="" loading="lazy">` : ico(r.icon || cfg.icon || 'label')}</div><div class="mid"><b>${esc(r.title || '—')}</b><small>${esc(r.sub || '')}</small></div>${r.badge ? `<span class="badge ${r.badge[1] || ''}">${esc(r.badge[0])}</span>` : ''}<div class="acts"></div></div>`);
       const A = $('.acts', row);
       (cfg.actions || []).forEach(a => { const b = h(`<button class="act" title="${esc(a.label)}">${ico(a.icon)}</button>`); b.onclick = () => a.fn(it); A.appendChild(b); });
       const e = h(`<button class="act" title="Edit">${ico('edit')}</button>`); e.onclick = () => edit(it);
@@ -672,7 +718,7 @@ function settings(ctx, cfg) {
     if (!form) return; let d; try { d = form.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
     const v = cfg.to ? cfg.to(d) : (cfg.raw ? d.value : d); if (v === false) return;
     const p = db.ref(cfg.path);
-    if (v === null || v === '') await p.remove(); else if (cfg.merge && typeof v === 'object') await p.update(clean(v)); else await p.set(typeof v === 'object' ? clean(v) : v);
+    if (v === null || v === '') await p.remove(); else if (cfg.merge && typeof v === 'object') { const cv = clean(v); await p.update(cv); for (const k of Object.keys(cv)) if (Array.isArray(cv[k])) await p.child(k).set(cv[k]); } else await p.set(typeof v === 'object' ? clean(v) : v);
     toast(cfg.savedMsg || 'Saved');
   }, 'save');
   B.appendChild(save); (cfg.buttons || []).forEach(b => B.appendChild(btn(b.label, b.cls || 'ghost', () => b.fn(() => form.get(), root), b.icon)));
@@ -701,7 +747,23 @@ const userName = id => (S.uMap[id] && S.uMap[id].username) || ('User ' + id);
 const refsOf = u => vals(u.referrals);
 const statusBadge = s => `<span class="badge ${s === 'approved' ? 'ok' : s === 'rejected' ? 'bad' : 'warn'}">${esc(s || 'pending')}</span>`;
 const skeleton = n => Array.from({ length: n }, () => '<div class="sk" style="height:64px;margin-bottom:10px"></div>').join('');
-const avatarHtml = u => `<div class="av">${u && u.profilePic && safeUrl(u.profilePic) ? `<img src="${esc(safeUrl(u.profilePic))}" alt="">` : esc(initial(u && u.username))}</div>`;
+/* Profile photos: users who upload a photo have it stored in avatars/<uid> (not in users/<uid>/profilePic), so load it from there on demand and cache it for 5 minutes. */
+const AVC = {}, AVQ = new Set();
+const avOk = v => typeof v === 'string' && (/^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/i.test(v) || /^https:\/\/\S+$/i.test(v));
+const avPic = u => { if (!u) return ''; const c = AVC[u._k]; if (c && c.v) return c.v; const p = String(u.profilePic || '').trim(); return /^https?:\/\//i.test(p) ? safeUrl(p) : ''; };
+const avatarHtml = u => { const pic = avPic(u), need = u && u._k && !(AVC[u._k] && Date.now() - AVC[u._k].t < 300000);
+  return `<div class="av"${need ? ` data-avuid="${esc(u._k)}"` : ''}>${pic ? `<img src="${esc(pic)}" alt="">` : esc(initial(u && u.username))}</div>`; };
+function hydrateAvatars() {
+  document.querySelectorAll('.av[data-avuid]').forEach(el => {
+    const uid = el.getAttribute('data-avuid'); if (!uid || AVQ.has(uid)) return; AVQ.add(uid);
+    db.ref('avatars/' + uid).once('value').then(s => { const v = s.val(); AVC[uid] = { v: avOk(v) ? v : '', t: Date.now() }; })
+      .catch(() => { AVC[uid] = { v: '', t: Date.now() }; })
+      .then(() => { AVQ.delete(uid); const c = AVC[uid];
+        document.querySelectorAll('.av[data-avuid]').forEach(x => { if (x.getAttribute('data-avuid') !== uid) return; x.removeAttribute('data-avuid');
+          if (c && c.v && !x.querySelector('img')) { const im = document.createElement('img'); im.alt = ''; im.src = c.v; x.textContent = ''; x.appendChild(im); } }); });
+  });
+}
+{ let tmr = null; new MutationObserver(() => { clearTimeout(tmr); tmr = setTimeout(hydrateAvatars, 80); }).observe(document.documentElement, { childList: true, subtree: true }); }
 
 /* ====================== DASHBOARD ====================== */
 function barSVG(values, labels, fmt, c1, c2) {
@@ -785,14 +847,9 @@ function openUser(uid) {
   Promise.all([db.ref('appSettings/withdrawGate').once('value'), db.ref('appSettings/withdrawSteps').once('value')]).then(([g, st]) => { wdg = { on: (g.val() || {}).enabled === true, steps: Object.entries(st.val() || {}).map(([k, x]) => Object.assign({ _k: k }, x)).filter(x => x && x.enabled !== false && x.title) }; render(); }).catch(() => { });
   const wdSection = u => {
     if (!wdg) return '';
-    const rows = wdg.steps.map(x => { let done, label = '';
-      if (x.type === 'earned') { const tg = num(x.target), v = num(u.totalEarned); done = v >= tg; label = money(v) + ' / ' + money(tg) + ' earned'; }
-      else if (x.type === 'days') { const tg = num(x.target), d = u.createdAt ? Math.max(0, Math.floor((Date.now() - new Date(u.createdAt).getTime()) / 864e5)) : 0; done = d >= tg; label = d + ' / ' + tg + ' days old'; }
-      else { done = !!((u.wdSteps || {})[x._k]); label = x.type === 'link' ? 'Link step' : 'Rule accepted'; }
-      return { x, done, label }; });
-    const dn = rows.filter(r => r.done).length, complete = dn === rows.length;
+    const rows = wdg.steps.map(x => Object.assign({ x }, wdProgress(uid, u, x))), dn = rows.filter(r => r.done).length, complete = dn === rows.length;
     const head = !wdg.on ? '<span class="badge">requirement is OFF</span>' : (complete ? '<span class="badge ok">withdraw activated</span>' : '<span class="badge bad">not activated</span>');
-    return `<h4 style="margin-bottom:8px">Withdraw activation</h4><div class="card" style="margin-bottom:18px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">${head}<small>${dn}/${rows.length} steps done${wdg.on && complete && u.withdrawActiveAt ? ' · activated ' + esc(fmtShort(u.withdrawActiveAt)) : ''}</small></div><div class="list">${rows.length ? rows.map(r => `<div class="row"><div class="mid"><b>${esc(r.x.title)}</b><small>${esc(r.label)}</small></div><span class="badge ${r.done ? 'ok' : ''}">${r.done ? 'done' : 'pending'}</span></div>`).join('') : '<small class="muted">No activation steps added yet.</small>'}</div></div>`;
+    return `<h4 style="margin-bottom:8px">Withdraw activation</h4><div class="card" style="margin-bottom:18px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px">${head}<small>${dn}/${rows.length} steps done${wdg.on && complete && u.withdrawActiveAt ? ' · activated ' + esc(fmtShort(u.withdrawActiveAt)) : ''}</small></div><div class="list">${rows.length ? rows.map(r => `<div class="row" style="flex-wrap:wrap"><div class="mid"><b>${esc(r.x.title)}</b><small>${esc(r.label)}</small>${r.pct !== undefined && !r.review ? `<div class="pbar" style="margin-top:6px;height:6px"><i style="width:${r.pct}%"></i></div>` : ''}</div><span class="badge ${r.done ? 'ok' : r.pending ? 'wa' : ''}">${r.done ? 'done' : r.pending ? 'review' : 'pending'}</span>${r.pending ? `<div style="display:flex;gap:8px;width:100%;margin-top:8px"><button class="btn sm" data-wd="ok" data-k="${esc(r.x._k)}">Approve</button><button class="btn ghost sm" data-wd="no" data-k="${esc(r.x._k)}">Reject</button></div>` : ''}</div>`).join('') : '<small class="muted">No activation steps added yet.</small>'}</div></div>`;
   };
   const render = () => {
     const u = S.uMap[uid]; if (!u) { body.innerHTML = `<div class="empty">${ico('person_off')}User not found (maybe deleted).</div>`; return; }
@@ -806,6 +863,7 @@ function openUser(uid) {
     <h4 style="margin-bottom:8px">Referrals (${refs.length})</h4><div class="list" style="margin-bottom:18px">${refs.length ? refs.slice(0, 10).map(r => `<div class="row"><div class="mid"><b>${esc(r.username)}</b><small>${esc(fmtShort(r.date))}</small></div><span class="pos">+${num(r.commission).toFixed(2)}</span></div>`).join('') : '<small class="muted">No referrals.</small>'}</div>
     <h4 style="margin-bottom:8px">Withdrawals (${wds.length})</h4><div class="list" style="margin-bottom:18px">${wds.length ? wds.slice(0, 8).map(w => `<div class="row"><div class="mid"><b>${money(w.amount)} · ${esc(w.method)}</b><small>${esc(fmtShort(w.date))}</small></div>${statusBadge(w.status)}</div>`).join('') : '<small class="muted">No withdrawals.</small>'}</div>
     <h4 style="margin-bottom:8px">Recent transactions</h4><div class="list">${txs.length ? txs.map(t => { const neg = t.type === 'withdraw' || (t.type === 'admin' && num(t.delta) < 0); return `<div class="row"><div class="mid"><b>${esc(t.description)}</b><small>${esc(fmtShort(t.date))}</small></div><span class="${neg ? 'neg' : 'pos'}">${neg ? '−' : '+'}${num(t.amount).toFixed(2)}</span></div>`; }).join('') : '<small class="muted">No transactions.</small>'}</div>`;
+    body.querySelectorAll('[data-wd]').forEach(b => b.onclick = () => wdDecide(uid, b.dataset.k, b.dataset.wd === 'ok'));
     const A = $('#uA', body);
     A.append(btn('Edit balance', '', () => editBalance(uid), 'edit'),
       btn(u.banned ? 'Unban' : 'Ban user', u.banned ? 'ok' : 'ghost', async () => { if (!u.banned && !await ask({ title: 'Ban ' + u.username + '?', msg: 'They will be logged out and blocked from the app.', ok: 'Ban', danger: true })) return; await db.ref('users/' + uid).update({ banned: !u.banned }); toast(u.banned ? 'User unbanned' : 'User banned'); }, u.banned ? 'lock_open' : 'block'),
@@ -952,8 +1010,8 @@ function withVis(cfg) {
 const mcq = (ctx, path, title, icon, singular) => crud(ctx, {
   path, title, icon, singular, search: ['question'], empty: 'No ' + title.toLowerCase() + ' yet — users will see an empty state until you add some.',
   defaults: { dailyLimit: 10 },
-  fields: [{ key: 'question', label: 'Question', type: 'textarea', rows: 3, required: true }, { key: 'options', correctKey: 'correct', label: 'Answer options', type: 'options', min: 2, max: 4 }, R.reward, { key: 'dailyLimit', label: 'Daily limit (per user)', type: 'number', int: true, min: 1, default: 10, half: true, hint: 'Users can earn from this many correct answers per day.' }],
-  row: i => ({ title: i.question, sub: `৳${num(i.reward)} · ${vals(i.options).length} options · ${num(i.dailyLimit) || 10}/day`, icon })
+  fields: [{ key: 'question', label: 'Question', type: 'textarea', rows: 3, required: true }, { key: 'options', correctKey: 'correct', label: 'Answer options', type: 'options', min: 2, max: 4 }, R.reward, { key: 'dailyLimit', label: 'Daily limit (per user, 0 = unlimited)', type: 'number', int: true, min: 0, default: 10, half: true, hint: 'How many attempts a user gets per day. 0 = unlimited (if any item is 0, the whole feature is unlimited).' }],
+  row: i => ({ title: i.question, sub: `৳${num(i.reward)} · ${vals(i.options).length} options · ${i.dailyLimit === undefined || i.dailyLimit === '' ? 10 : (num(i.dailyLimit) > 0 ? num(i.dailyLimit) + '/day' : 'unlimited')}`, icon })
 });
 const linkCrud = (ctx, path, title, icon, singular) => crud(ctx, {
   path, title, icon, singular, search: ['title', 'link'], desc: 'Users open the link, stay for the time you set on each item (default 15 seconds), then claim the reward.',
@@ -964,24 +1022,101 @@ const limitForm = (ctx, path, title, icon, desc) => settings(ctx, { path, title,
 const ghUrl = u => { const m = /^https?:\/\/(?:www\.)?github\.com\/([^\/\s]+)\/([^\/\s?#]+)\/?$/i.exec(String(u || '').trim()); return m ? 'https://' + m[1].toLowerCase() + '.github.io/' + m[2].replace(/\.git$/, '') + '/' : u; };
 const featFrame = (it, extra) => { const f = h(`<iframe class="fx" sandbox="allow-scripts allow-popups allow-forms allow-same-origin" allow="fullscreen" style="${extra || 'height:60vh'}"></iframe>`); if (it.type === 'link' && safeUrl(it.url)) f.src = safeUrl(it.url); else { f.setAttribute('sandbox', 'allow-scripts allow-popups allow-forms'); f.srcdoc = it.code || ''; } return f; };
 const previewFeature = it => { const f = featFrame(it); const body = h('<div></div>'); body.appendChild(f); if (it.type === 'link' && safeUrl(it.url)) body.appendChild(h(`<p style="margin-top:8px"><a href="${esc(safeUrl(it.url))}" target="_blank" rel="noopener">Open in new tab</a> · some sites block being shown inside a frame.</p>`)); openSheet({ title: it.name || 'Preview', body, wide: true }); };
-const featureCfg = (path, title, who) => ({ path, title, icon: 'widgets', singular: 'feature', search: ['name', 'url'], stamp: 'iso', desc: who, defaults: { type: 'html', icon: 'widgets', enabled: true }, fields: [{ key: 'name', label: 'Name', type: 'text', required: true, half: true }, { key: 'icon', label: 'Material icon name', type: 'text', default: 'widgets', half: true }, { key: 'type', label: 'Type', type: 'select', options: [['html', 'HTML / JS code'], ['link', 'Game / website link (GitHub Pages, Netlify…)']], default: 'html' }, { key: 'url', label: 'Link (for “Game / website link”)', type: 'url', placeholder: 'https://username.github.io/my-game/', hint: 'A github.com/user/repo link is converted to user.github.io/repo automatically — enable GitHub Pages on the repo first.' }, { key: 'code', label: 'HTML / JS code (for “HTML / JS code”)', type: 'textarea', rows: 8, hint: 'Runs in a sandboxed frame — it cannot access your session or data.' }, { key: 'enabled', label: 'Visible', type: 'switch', text: 'Show this feature to users', default: true }], prepare: d => { if (d.type === 'link') { d.url = ghUrl(d.url); if (!d.url) { toast('Enter the game / website link', 'bad'); return null; } } else if (!d.code) { toast('Enter the HTML / JS code', 'bad'); return null; } return d; }, row: i => ({ title: i.name, sub: i.type === 'link' ? (i.url || 'Link') : 'HTML widget', icon: i.icon || 'widgets', badge: [i.enabled === false ? 'hidden' : 'visible', i.enabled === false ? '' : 'ok'] }), actions: [{ icon: 'visibility', label: 'Preview', fn: previewFeature }, { icon: 'toggle_on', label: 'Show / hide', fn: i => db.ref(path + '/' + i._k).update({ enabled: i.enabled === false }) }] });
+const featureCfg = (path, title, who) => ({ path, title, icon: 'widgets', singular: 'feature', search: ['name', 'url'], stamp: 'iso', desc: who, defaults: { type: 'html', enabled: true }, fields: [{ key: 'name', label: 'Name', type: 'text', required: true, half: true }, { key: 'logo', label: 'Logo link (image URL)', type: 'url', placeholder: 'https://…/logo.png', half: true, preview: true, hint: 'Paste a direct image link. Leave empty to use the default icon.' }, { key: 'type', label: 'Type', type: 'select', options: [['html', 'HTML / JS code'], ['link', 'Game / website link (GitHub Pages, Netlify…)']], default: 'html' }, { key: 'url', label: 'Link (for “Game / website link”)', type: 'url', placeholder: 'https://username.github.io/my-game/', hint: 'A github.com/user/repo link is converted to user.github.io/repo automatically — enable GitHub Pages on the repo first.' }, { key: 'code', label: 'HTML / JS code (for “HTML / JS code”)', type: 'textarea', rows: 8, hint: 'Runs in a sandboxed frame — it cannot access your session or data.' }, { key: 'enabled', label: 'Visible', type: 'switch', text: 'Show this feature to users', default: true }], prepare: d => { if (d.type === 'link') { d.url = ghUrl(d.url); if (!d.url) { toast('Enter the game / website link', 'bad'); return null; } } else if (!d.code) { toast('Enter the HTML / JS code', 'bad'); return null; } return d; }, row: i => ({ title: i.name, sub: i.type === 'link' ? (i.url || 'Link') : 'HTML widget', thumb: i.logo || '', icon: i.icon || 'widgets', badge: [i.enabled === false ? 'hidden' : 'visible', i.enabled === false ? '' : 'ok'] }), actions: [{ icon: 'visibility', label: 'Preview', fn: previewFeature }, { icon: 'toggle_on', label: 'Show / hide', fn: i => db.ref(path + '/' + i._k).update({ enabled: i.enabled === false }) }] });
+
+/* ---- Social brand logos (same detection as the user app) ---- */
+const BRANDS={
+ telegram:{bg:'#229ED9',svg:()=>'<path d="M3.2 11.3 20 4.6c.8-.3 1.5.2 1.2 1.4l-2.9 13.4c-.2 1-.8 1.2-1.6.8l-4.4-3.3-2.1 2c-.2.2-.4.4-.9.4l.3-4.6 8.3-7.5c.4-.3-.1-.5-.6-.2l-10.3 6.5-4.4-1.4c-1-.3-1-1 .2-1.5z" fill="#fff"/>'},
+ youtube:{bg:'#FF0000',svg:b=>`<rect x="2.5" y="5.5" width="19" height="13" rx="4" fill="#fff"/><path d="M10 9v6l5.2-3z" fill="${b}"/>`},
+ facebook:{bg:'#1877F2',svg:()=>'<path d="M13.6 21.5v-8h2.7l.4-3.2h-3.1V8.4c0-.9.3-1.5 1.6-1.5h1.7V4c-.3 0-1.3-.1-2.5-.1-2.5 0-4.1 1.5-4.1 4.2v2.2H7.5v3.2h2.8v8z" fill="#fff"/>'},
+ instagram:{bg:'radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%)',svg:()=>'<rect x="3.6" y="3.6" width="16.8" height="16.8" rx="5" fill="none" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="3.9" fill="none" stroke="#fff" stroke-width="2"/><circle cx="17" cy="7" r="1.2" fill="#fff"/>'},
+ whatsapp:{bg:'#25D366',svg:()=>'<path d="M12 3.4a8.5 8.5 0 0 0-7.3 12.9L3.5 20.6l4.4-1.2A8.5 8.5 0 1 0 12 3.4z" fill="none" stroke="#fff" stroke-width="1.9" stroke-linejoin="round"/><path d="M9.3 8.3c-.4.4-.6 1-.4 1.8.4 1.3 1.4 2.6 2.8 3.6 1 .7 2 1.1 2.9.9.5-.1.9-.6 1-1.1l-1.6-.9-.8.7c-.8-.3-1.9-1.4-2.3-2.2l.6-.8-.9-1.6c-.3 0-.6.1-.7.3z" fill="#fff"/>'},
+ tiktok:{bg:'#111',svg:()=>'<path d="M16.6 3.2c.3 2.3 1.7 3.8 4 4v3.1c-1.4 0-2.8-.4-4-1.2v6.1a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v3.2a2.5 2.5 0 1 0 1.6 2.3V3.2z" fill="#fff"/>'},
+ x:{bg:'#111',svg:()=>'<path d="M5.5 5l13 14M18.5 5l-13 14" stroke="#fff" stroke-width="2.3" stroke-linecap="round"/>'},
+ linkedin:{bg:'#0A66C2',svg:()=>'<text x="12" y="17" text-anchor="middle" font-size="13" font-weight="800" font-family="Arial,sans-serif" fill="#fff">in</text>'},
+ discord:{bg:'#5865F2',svg:()=>'<path d="M7 7.5c1.5-.9 3-1.2 5-1.2s3.5.3 5 1.2c1.5 2.3 2.2 4.7 2.3 7.5-1.1 1-2.3 1.5-3.6 1.8l-.9-1.5c.5-.2 1-.4 1.4-.7-1.1.5-2.4.8-4.2.8s-3.1-.3-4.2-.8c.4.3.9.5 1.4.7l-.9 1.5c-1.3-.3-2.5-.8-3.6-1.8.1-2.8.8-5.2 2.3-7.5z" fill="#fff"/><circle cx="9.4" cy="12.2" r="1.2" fill="#5865F2"/><circle cx="14.6" cy="12.2" r="1.2" fill="#5865F2"/>'},
+ pinterest:{bg:'#E60023',svg:()=>'<text x="12" y="18" text-anchor="middle" font-size="16" font-weight="800" font-family="Georgia,serif" fill="#fff">P</text>'},
+ web:{bg:'linear-gradient(135deg,#6c5ce7,#00c2ff)',svg:()=>'<circle cx="12" cy="12" r="8.2" fill="none" stroke="#fff" stroke-width="1.8"/><ellipse cx="12" cy="12" rx="3.6" ry="8.2" fill="none" stroke="#fff" stroke-width="1.6"/><path d="M4 12h16" stroke="#fff" stroke-width="1.6"/>'}
+};
+function brandKey(l){
+  let h='';try{h=new URL(safeUrl(l.url)).hostname.replace(/^www\./,'').toLowerCase()}catch(e){}
+  const has=(...a)=>a.some(d=>h===d||h.endsWith('.'+d));
+  if(has('t.me','telegram.me','telegram.org','telegram.dog'))return 'telegram';
+  if(has('youtube.com','youtu.be','youtube-nocookie.com'))return 'youtube';
+  if(has('facebook.com','fb.com','fb.me','fb.watch','m.me'))return 'facebook';
+  if(has('instagram.com','instagr.am'))return 'instagram';
+  if(has('wa.me','whatsapp.com','whatsapp.net'))return 'whatsapp';
+  if(has('tiktok.com'))return 'tiktok';
+  if(has('twitter.com','x.com'))return 'x';
+  if(has('linkedin.com','lnkd.in'))return 'linkedin';
+  if(has('discord.gg','discord.com','discordapp.com'))return 'discord';
+  if(has('pinterest.com','pin.it'))return 'pinterest';
+  const pl=String(l.platform||'').toLowerCase();
+  const m={twitter:'x',x:'x',youtube:'youtube',facebook:'facebook',instagram:'instagram',telegram:'telegram',whatsapp:'whatsapp',tiktok:'tiktok',linkedin:'linkedin',discord:'discord',pinterest:'pinterest'};
+  return m[pl]||'web';
+}
+function brandLogo(l,px){const k=BRANDS[brandKey(l)];px=px||22;return {bg:k.bg,html:`<svg width="${px}" height="${px}" viewBox="0 0 24 24" aria-hidden="true">${k.svg(k.bg)}</svg>`}}
 
 const VIEWS = {
   dashboard: vDash, users: vUsers, withdrawals: vWd, transactions: vTx,
   tasks: ctx => page(ctx, 'Multiple-choice tasks users solve to earn coins.', mcq(ctx, 'tasks', 'Tasks', 'assignment', 'task')),
   quiz: ctx => page(ctx, 'Quiz questions shown on the Quiz & Earn page.', mcq(ctx, 'quizzes', 'Quiz questions', 'quiz', 'question')),
-  spin: ctx => page(ctx, 'Each wheel segment is one reward. Add 0 for a "better luck next time" segment.', settings(ctx, { path: 'spinSettings', title: 'Spin wheel', icon: 'casino', fields: [{ key: 'rewards', label: 'Segment rewards (৳)', type: 'chips', allowZero: true, min: 2, hint: 'At least 2 segments.' }, { key: 'limit', label: 'Spins per user per day', type: 'number', int: true, min: 1, default: 3, required: true }], to: d => ({ rewards: d.rewards, limit: d.limit }) })),
+  spin: ctx => page(ctx, 'Each wheel segment is one reward. Add 0 for a "better luck next time" segment.', settings(ctx, { path: 'spinSettings', title: 'Spin wheel', icon: 'casino', fields: [{ key: 'rewards', label: 'Segment rewards (৳)', type: 'chips', allowZero: true, min: 2, hint: 'At least 2 segments. Tap a segment to edit it, ✕ to delete it.' }, { key: 'limit', label: 'Spins per user per day (0 = unlimited)', type: 'number', int: true, min: 0, default: 3, required: true }], to: d => ({ rewards: d.rewards, limit: d.limit }) })),
   videos: ctx => page(ctx, 'Users watch a random video; the timer only runs while it plays.', limitForm(ctx, 'gameSettings/video', 'Daily video limit', 'timer', 'How many videos one user may complete per day.'), settings(ctx, { path: 'gameSettings/videoRules', raw: true, title: 'Watch & Earn rules', icon: 'gavel', desc: 'Shown to users at the bottom of the Watch & Earn page. Write one rule per line. Leave empty and save to hide.', fields: [{ key: 'value', label: 'Rules', type: 'textarea', rows: 7, placeholder: 'Watch the video until the timer ends.\nDo not pause or close the app.' }] }), crud(ctx, {
     path: 'videos', title: 'Videos', icon: 'smart_display', singular: 'video', search: ['title', 'url'], defaults: { type: 'youtube', watchTime: 1 },
     fields: [{ key: 'type', label: 'Type', type: 'select', options: [['youtube', 'YouTube'], ['mp4', 'Direct video (mp4/webm)'], ['other', 'Other embeddable page']], default: 'youtube', half: true }, { key: 'title', label: 'Title', type: 'text', half: true }, { key: 'url', label: 'Video URL', type: 'url', required: true, placeholder: 'https://youtu.be/…' }, R.reward, { key: 'watchTime', label: 'Watch time (minutes)', type: 'number', min: 0.1, default: 1, required: true, half: true }],
     prepare: d => { if (!d.title) d.title = d.type; return d; }, row: i => ({ title: i.title || i.url, sub: `৳${num(i.reward)} · ${num(i.watchTime)} min · ${i.type}`, thumb: ytId(i.url) ? 'https://img.youtube.com/vi/' + ytId(i.url) + '/mqdefault.jpg' : '', icon: 'smart_display' })
   })),
-  scratch: ctx => page(ctx, 'A random image is hidden under the scratch layer; its reward is paid when revealed.', settings(ctx, { path: 'scratchDailyLimit', raw: true, title: 'Daily scratch limit', icon: 'timer', fields: [{ key: 'value', label: 'Scratches per user per day', type: 'number', int: true, min: 1, required: true, default: 5 }] }), crud(ctx, {
+  scratch: ctx => page(ctx, 'A random image is hidden under the scratch layer; its reward is paid when revealed.', settings(ctx, { path: 'scratchDailyLimit', raw: true, title: 'Daily scratch limit', icon: 'timer', fields: [{ key: 'value', label: 'Scratches per user per day (0 = unlimited)', type: 'number', int: true, min: 0, required: true, default: 5 }] }), crud(ctx, {
     path: 'scratchImages', title: 'Scratch card images', icon: 'blur_on', singular: 'card', search: ['name'],
     fields: [{ key: 'name', label: 'Name', type: 'text', required: true, half: true }, { key: 'reward', label: 'Reward (৳)', type: 'number', required: true, min: 0, half: true }, { key: 'url', label: 'Image URL', type: 'url', required: true, preview: true }],
     row: i => ({ title: i.name, sub: '৳' + num(i.reward), thumb: i.url, icon: 'blur_on' })
   })),
   ttt: ctx => page(ctx, 'Users play against the computer. A win pays a random reward from your list.', settings(ctx, { path: 'gameSettings/ttt', merge: true, title: 'Tic Tac Toe', icon: 'grid_on', fields: [{ key: 'rewards', label: 'Win rewards (৳)', type: 'chips', min: 1, hint: 'One is picked at random on each win.' }, { key: 'limit', label: 'Games per user per day (0 = unlimited)', type: 'number', int: true, min: 0, default: 0, half: true }, { key: 'level', label: 'Computer difficulty', type: 'select', options: [['easy', 'Easy'], ['medium', 'Medium'], ['hard', 'Hard (unbeatable)']], default: 'easy', half: true }] })),
+  puzzle: ctx => page(ctx, 'Brain Road: users slide the tiles to rebuild a photo you add below. Finishing a puzzle pays a random reward from your list, then the next photo opens automatically.',
+    settings(ctx, { path: 'gameSettings/puzzle', merge: true, title: 'Brain Road settings', icon: 'extension',
+      fields: [
+        { key: 'rewards', label: 'Completion rewards (৳)', type: 'chips', min: 1, hint: 'One amount is picked at random each time a user completes a puzzle. Tap a chip to edit, ✕ to delete.' },
+        { key: 'limit', label: 'Puzzles per user per day (0 = unlimited)', type: 'number', int: true, min: 0, default: 0, hint: 'A puzzle is counted when the user makes the first move.' },
+        { key: 'grids', label: 'Grid sizes available', type: 'checks', min: 1, options: [[3, '3x3'], [4, '4x4'], [5, '5x5'], [6, '6x6'], [7, '7x7'], [8, '8x8'], [9, '9x9'], [10, '10x10']], default: [3, 4, 5], hint: 'Users do not choose a size. Puzzles go through the sizes you select, one after another, then repeat (e.g. 3x3 → 4x4 → 5x5 → 3x3…).' },
+        { key: 'grid', label: 'Start with grid size', type: 'select', options: [[3, '3x3'], [4, '4x4'], [5, '5x5'], [6, '6x6'], [7, '7x7'], [8, '8x8'], [9, '9x9'], [10, '10x10']], default: 3, half: true },
+        { key: 'showNumbers', label: 'Tile numbers', type: 'switch', text: 'Show numbers on the tiles', default: false },
+        { key: 'showCoin', label: 'Reward coin', type: 'switch', text: 'Show the reward amount to users', default: true },
+        { key: 'allowSkip', label: 'Skip / Next / Previous', type: 'switch', text: 'Let users change or skip the photo', default: true },
+        { key: 'allowPeek', label: 'Preview button', type: 'switch', text: 'Let users hold a button to peek at the full photo', default: true },
+        { key: 'autoNext', label: 'Auto next', type: 'switch', text: 'Open the next photo automatically after a puzzle is solved', default: true }
+      ],
+      to: d => { const g = (d.grids || []).map(Number).filter(n => n >= 3 && n <= 10); const s = Number(d.grid) || 3; if (!g.includes(s)) g.push(s); g.sort((a, b) => a - b); return { rewards: d.rewards, limit: d.limit, grids: g, grid: s, showNumbers: d.showNumbers, showCoin: d.showCoin, allowSkip: d.allowSkip, allowPeek: d.allowPeek, autoNext: d.autoNext }; } }),
+    crud(ctx, {
+      path: 'gameSettings/puzzleImages', title: 'Puzzle photos', icon: 'photo_library', singular: 'photo', search: ['name'], defaults: { enabled: true },
+      desc: 'Add, edit or delete the photos users solve. Upload from your device (auto-compressed) or paste an https:// link. Around 5–12 photos is ideal.',
+      empty: 'No photos yet — add at least one so users can play Brain Road.',
+      fields: [{ key: 'name', label: 'Photo name', type: 'text', required: true, maxlen: 60 }, { key: 'url', label: 'Photo', type: 'image', required: true }, { key: 'enabled', label: 'Visibility', type: 'switch', text: 'Show this photo to users', default: true }],
+      row: i => ({ title: i.name, sub: i.enabled === false ? 'Hidden from users' : 'Visible to users', thumb: i.url, icon: 'image', badge: [i.enabled === false ? 'hidden' : 'visible', i.enabled === false ? '' : 'ok'] }),
+      actions: [{ icon: 'visibility', label: 'Show / hide', fn: async i => { try { await db.ref('gameSettings/puzzleImages/' + i._k).update({ enabled: i.enabled === false }); toast(i.enabled === false ? 'Now visible to users' : 'Hidden from users'); } catch (e) { fail(e, 'Could not update'); } } }]
+    })),
+  rps: ctx => page(ctx, 'Users play Rock Paper Scissors against the computer. A win pays a random reward from your list.',
+    settings(ctx, { path: 'gameSettings/rps', merge: true, title: 'Rock Paper Scissors', icon: 'pan_tool',
+      fields: [
+        { key: 'rewards', label: 'Win rewards (৳)', type: 'chips', min: 1, hint: 'One amount is picked at random on each win. Add, edit (tap a chip) or delete (✕) any coin.' },
+        { key: 'limit', label: 'Rounds per user per day (0 = unlimited)', type: 'number', int: true, min: 0, default: 0, half: true },
+        { key: 'level', label: 'Computer luck', type: 'select', options: [['easy', 'Easy — users win more often'], ['fair', 'Fair — random'], ['hard', 'Hard — users win less often']], default: 'fair', half: true },
+        { key: 'showCoin', label: 'Reward coin', type: 'switch', text: 'Show the reward amount to users', default: true }
+      ] })),
+  watchads: ctx => page(ctx, 'Users watch a Google AdMob rewarded video ad inside your Android app. The reward is paid only after the ad has been watched to the end.',
+    settings(ctx, { path: 'gameSettings/watchadsRules', raw: true, title: 'Watch Ads rules', icon: 'gavel', desc: 'Shown to users at the bottom of the Watch Ads page. Write one rule per line. Leave empty and save to hide.', fields: [{ key: 'value', label: 'Rules', type: 'textarea', rows: 8, placeholder: 'Watch the full ad until the countdown (up to 30 seconds) ends.\nSome ads ask you to download and use an app — follow the ad until it finishes.\nDo not close the ad early, or you will not receive the coin.' }] }),
+    settings(ctx, { path: 'gameSettings/watchads', merge: true, title: 'Watch Ads (AdMob)', icon: 'ads_click',
+      warn: 'AdMob rule: reward users for WATCHING an ad, never for clicking it. Paying or forcing clicks counts as invalid activity and can get your AdMob account banned, so this feature pays on a completed rewarded video only.',
+      fields: [
+        { key: 'rewards', label: 'Reward per ad (৳)', type: 'chips', min: 1, hint: 'One amount is picked at random each time a user finishes an ad. Add, edit or delete any coin.' },
+        { key: 'limit', label: 'Ads per user per day (0 = unlimited)', type: 'number', int: true, min: 0, default: 10, half: true },
+        { key: 'cooldown', label: 'Wait between ads (seconds)', type: 'number', int: true, min: 0, default: 30, half: true },
+        { key: 'showCoin', label: 'Reward coin', type: 'switch', text: 'Show the reward amount to users', default: true },
+        { key: 'useTestAds', label: 'Test ads', type: 'switch', text: 'Use Google test ads (keep ON while testing; turn OFF when your app is live)', default: true, hint: 'Never tap real ads on your own device — use test ads for testing.' },
+        { key: 'appId', label: 'AdMob App ID', type: 'text', placeholder: 'ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX', hint: 'For your records. The App ID itself goes into the Android app (AndroidManifest.xml) — see ADMOB_SETUP.md.' },
+        { key: 'rewardedUnitId', label: 'Rewarded ad unit ID', type: 'text', placeholder: 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX', hint: 'Create a “Rewarded” ad unit in AdMob and paste its ID here. Used when Test ads is OFF.' },
+        { key: 'testMode', label: 'Browser simulation', type: 'switch', text: 'Simulate an ad in a normal browser (testing only!)', default: false, hint: 'Keep OFF in production — otherwise users on the website could earn without watching a real ad.' }
+      ] })),
   captcha: ctx => page(ctx, 'The app shows only the captchas you add here — nothing is auto-generated. With none added, users see an empty state.', limitForm(ctx, 'gameSettings/captcha', 'Daily captcha limit', 'timer', 'How many captchas one user may solve per day.'), crud(ctx, {
     path: 'captchas', title: 'Captchas', icon: 'security', singular: 'captcha', search: ['text'], empty: 'No captchas yet — the Captcha feature stays empty for users.',
     fields: [{ key: 'text', label: 'Captcha text', type: 'text', required: true, maxlen: 16, hint: 'Letters/numbers users must type (case-insensitive).' }, { key: 'reward', label: 'Reward (৳)', type: 'number', required: true, min: 0 }],
@@ -989,18 +1124,18 @@ const VIEWS = {
   })),
   offers: ctx => page(ctx, null, linkCrud(ctx, 'offers', 'Offers', 'local_offer', 'offer')),
   surveys: ctx => page(ctx, null, linkCrud(ctx, 'surveys', 'Surveys', 'poll', 'survey')),
-  daily: ctx => page(ctx, 'Users can claim this once every 24 hours.', settings(ctx, { path: 'dailyBonus', raw: true, title: 'Daily check-in bonus', icon: 'event_available', fields: [{ key: 'value', label: 'Bonus per day (৳)', type: 'number', min: 0, required: true }] })),
+  daily: ctx => page(ctx, 'Users can claim this bonus once every set number of hours (24 by default).', settings(ctx, { path: 'gameSettings/checkin', merge: true, title: 'Claim interval', icon: 'schedule', desc: 'How many hours a user must wait between two check-in bonuses.', fields: [{ key: 'hours', label: 'Hours between claims', type: 'number', step: 'any', min: 0.01, default: 24, required: true, hint: 'Examples: 24 = once a day, 12 = twice a day, 6 = four times a day, 48 = every two days.' }], to: d => ({ hours: d.hours }) }), settings(ctx, { path: 'dailyBonus', raw: true, title: 'Daily check-in bonus', icon: 'event_available', fields: [{ key: 'value', label: 'Bonus per day (৳)', type: 'number', min: 0, required: true }] })),
   signup: ctx => page(ctx, null, settings(ctx, { path: 'signupBonus', title: 'Signup bonus', icon: 'person_add', desc: 'Paid once to every new account.', from: v => (typeof v === 'number' ? { amount: v, enabled: true } : { amount: v && v.amount, enabled: v ? v.enabled !== false : true }), fields: [{ key: 'enabled', label: 'Enabled', type: 'switch', text: 'Give new users a bonus' }, { key: 'amount', label: 'Bonus amount (৳)', type: 'number', min: 0, required: true }], to: d => ({ amount: d.amount, enabled: d.enabled }) })),
   referral: ctx => { page(ctx, null, settings(ctx, { path: 'referralSettings', merge: true, title: 'Referral program', icon: 'group_add', fields: [{ key: 'enabled', label: 'Signup option', type: 'switch', text: 'Allow referral codes at signup (and pay referral rewards)', default: true }, { key: 'showInApp', label: 'Invite visibility', type: 'switch', text: 'Show “Invite” in the app (Home button & All features)', default: true }, { key: 'commission', label: 'Commission for referrer (৳)', type: 'number', min: 0, required: true, half: true }, { key: 'bonus', label: 'Bonus for new user (৳)', type: 'number', min: 0, required: true, half: true }] })); vRefHist(ctx); },
   banners: ctx => page(ctx, 'Shown as a sliding banner on the app home screen.', crud(ctx, { path: 'dashboardBanners', title: 'Home banners', icon: 'view_carousel', singular: 'banner', stamp: 'iso', search: ['link'], defaults: { enabled: true }, fields: [{ key: 'imageUrl', label: 'Image URL', type: 'url', required: true, preview: true }, { key: 'link', label: 'Click-through link (optional)', type: 'url' }, { key: 'enabled', label: 'Visible', type: 'switch', text: 'Show this banner', default: true }], row: i => ({ title: i.link || 'Banner', sub: fmtShort(i.date), thumb: i.imageUrl, badge: [i.enabled ? 'visible' : 'hidden', i.enabled ? 'ok' : ''], icon: 'image' }), actions: [{ icon: 'toggle_on', label: 'Toggle', fn: i => db.ref('dashboardBanners/' + i._k).update({ enabled: !i.enabled }) }] })),
   popups: ctx => page(ctx, 'The newest enabled popup is shown to each user once per session.', crud(ctx, { path: 'popups', push: true, stamp: 'ms', title: 'Popups', icon: 'crop_free', singular: 'popup', search: ['title'], defaults: { enabled: true, autoClose: 5 }, sortFn: (a, b) => num(b.date) - num(a.date), fields: [{ key: 'title', label: 'Title', type: 'text', required: true }, { key: 'image', label: 'Image URL', type: 'url', required: true, preview: true }, { key: 'link', label: 'Button link (optional)', type: 'url' }, { key: 'autoClose', label: 'Auto-close after (seconds, 0 = manual)', type: 'number', int: true, min: 0, default: 5, half: true }, { key: 'enabled', label: 'Enabled', type: 'switch', text: 'Active', default: true, half: true }], row: i => ({ title: i.title, sub: 'auto-close ' + (num(i.autoClose) || 'off') + (num(i.autoClose) ? 's' : ''), thumb: i.image, badge: [i.enabled ? 'active' : 'off', i.enabled ? 'ok' : ''], icon: 'crop_free' }), actions: [{ icon: 'toggle_on', label: 'Toggle', fn: i => db.ref('popups/' + i._k).update({ enabled: !i.enabled }) }] })),
   notifications: ctx => page(ctx, 'Broadcast messages appear in every user’s notification inbox.', crud(ctx, { path: 'notifications', title: 'Notifications', icon: 'notifications', singular: 'notification', stamp: 'iso', search: ['title', 'message'], fields: [{ key: 'title', label: 'Title', type: 'text', required: true }, { key: 'message', label: 'Message', type: 'textarea', rows: 5, required: true }], row: i => ({ title: i.title, sub: `${fmtShort(i.date)} · ${i.message || ''}`, icon: 'notifications' }) })),
   notices: ctx => page(ctx, null, crud(ctx, { path: 'notices', title: 'Notice board', icon: 'campaign', singular: 'notice', stamp: 'iso', search: ['title', 'content'], fields: [{ key: 'title', label: 'Title', type: 'text', required: true }, { key: 'content', label: 'Content', type: 'textarea', rows: 6, required: true }], row: i => ({ title: i.title, sub: `${fmtShort(i.date)} · ${i.content || ''}`, icon: 'campaign' }) })),
-  social: ctx => page(ctx, null, crud(ctx, { path: 'socialLinks', title: 'Social links', icon: 'share', singular: 'link', search: ['name', 'url'], defaults: { platform: 'youtube', icon: 'link' }, fields: [{ key: 'platform', label: 'Platform', type: 'select', options: ['youtube', 'facebook', 'instagram', 'telegram', 'whatsapp', 'tiktok', 'twitter', 'linkedin', 'discord', 'pinterest', 'website', 'other'], half: true, hint: 'The logo is detected automatically from the URL.' }, { key: 'name', label: 'Display name', type: 'text', required: true, half: true }, { key: 'url', label: 'URL', type: 'url', required: true }, { key: 'icon', label: 'Material icon name', type: 'text', default: 'link', hint: 'e.g. play_arrow, send, language, link' }], row: i => ({ title: i.name, sub: `${i.platform} · ${i.url}`, icon: i.icon || 'link' }) })),
+  social: ctx => page(ctx, null, crud(ctx, { path: 'socialLinks', title: 'Social links', icon: 'share', singular: 'link', search: ['name', 'url'], defaults: { platform: 'youtube', icon: 'link' }, fields: [{ key: 'platform', label: 'Platform', type: 'select', options: ['youtube', 'facebook', 'instagram', 'telegram', 'whatsapp', 'tiktok', 'twitter', 'linkedin', 'discord', 'pinterest', 'website', 'other'], half: true, hint: 'The logo is detected automatically from the URL.' }, { key: 'name', label: 'Display name', type: 'text', required: true, half: true }, { key: 'url', label: 'URL', type: 'url', required: true }, { key: 'icon', label: 'Material icon name', type: 'text', default: 'link', hint: 'e.g. play_arrow, send, language, link' }], row: i => ({ title: i.name, sub: `${i.platform} · ${i.url}`, icon: i.icon || 'link', logo: brandLogo(i, 28) }) })),
   features: ctx => page(ctx, 'Add HTML code or a game / website link (e.g. GitHub Pages). It appears in the user app under Extras.', crud(ctx, featureCfg('customFeatures', 'Custom features', ''))),
   widgets: ctx => { const c = crud(ctx, featureCfg('adminFeatures', 'Admin widgets', '')); const g = h(`<section class="card block"><div class="blk-h"><h3>${ico('dashboard_customize')} Live widgets</h3></div><div class="wgrid" id="wg"></div></section>`); ctx.listen('adminFeatures', s => { const w = $('#wg', g); w.innerHTML = ''; let n = 0; s.forEach(c => { const v = c.val(); if (!v) return; n++; const box = h(`<div><b style="display:block;margin-bottom:6px">${esc(v.name)}</b></div>`); box.appendChild(featFrame(v, '')); w.appendChild(box); }); if (!n) w.innerHTML = '<div class="empty" style="grid-column:1/-1">No widgets yet.</div>'; });
     const x = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('widgets')} User Extras control</h3><p>Features added in “Custom features” — show or hide them for users, or test them live.</p></div></div><div class="list" id="xl"></div></section>`);
-    ctx.listen('customFeatures', s => { const L = $('#xl', x); L.innerHTML = ''; let n = 0; s.forEach(c => { const v = c.val(); if (!v) return; n++; const it = Object.assign({ _k: c.key }, v), on = it.enabled !== false; const row = h(`<div class="row"><div class="thumb">${ico(it.icon || 'widgets')}</div><div class="mid"><b>${esc(it.name || 'Feature')}</b><small>${esc(it.type === 'link' ? (it.url || 'Link') : 'HTML widget')}</small></div><span class="badge ${on ? 'ok' : ''}">${on ? 'visible' : 'hidden'}</span><div class="acts"></div></div>`); const A = $('.acts', row); const pv = h(`<button class="act" title="Test">${ico('play_arrow')}</button>`); pv.onclick = () => previewFeature(it); const tg = h(`<button class="act" title="${on ? 'Hide from users' : 'Show to users'}">${ico(on ? 'visibility_off' : 'visibility')}</button>`); tg.onclick = () => db.ref('customFeatures/' + c.key).update({ enabled: !on }).then(() => toast(on ? 'Hidden from users' : 'Visible to users')).catch(e => toast(e.message, 'bad')); A.append(pv, tg); L.appendChild(row); }); if (!n) L.innerHTML = '<div class="empty">No custom features yet — add one in “Custom features”.</div>'; });
+    ctx.listen('customFeatures', s => { const L = $('#xl', x); L.innerHTML = ''; let n = 0; s.forEach(c => { const v = c.val(); if (!v) return; n++; const it = Object.assign({ _k: c.key }, v), on = it.enabled !== false; const row = h(`<div class="row"><div class="thumb">${safeUrl(it.logo) ? `<img src="${esc(safeUrl(it.logo))}" alt="" referrerpolicy="no-referrer">` : ico(it.icon || 'widgets')}</div><div class="mid"><b>${esc(it.name || 'Feature')}</b><small>${esc(it.type === 'link' ? (it.url || 'Link') : 'HTML widget')}</small></div><span class="badge ${on ? 'ok' : ''}">${on ? 'visible' : 'hidden'}</span><div class="acts"></div></div>`); const A = $('.acts', row); const pv = h(`<button class="act" title="Test">${ico('play_arrow')}</button>`); pv.onclick = () => previewFeature(it); const tg = h(`<button class="act" title="${on ? 'Hide from users' : 'Show to users'}">${ico(on ? 'visibility_off' : 'visibility')}</button>`); tg.onclick = () => db.ref('customFeatures/' + c.key).update({ enabled: !on }).then(() => toast(on ? 'Hidden from users' : 'Visible to users')).catch(e => toast(e.message, 'bad')); A.append(pv, tg); L.appendChild(row); }); if (!n) L.innerHTML = '<div class="empty">No custom features yet — add one in “Custom features”.</div>'; });
     page(ctx, 'Private HTML tools for yourself, plus live control of the Extras users see.', c, g, x); },
   ads: ctx => page(ctx, 'Pasted code is injected into ad slots across the app.', settings(ctx, { path: 'adsCode', raw: true, title: 'Ads code', icon: 'ads_click', fields: [{ key: 'value', label: 'Ad HTML / script', type: 'textarea', rows: 8 }], buttons: [{ label: 'Clear ads', icon: 'delete', fn: async () => { if (await ask({ title: 'Remove ads code?', ok: 'Remove', danger: true })) { await db.ref('adsCode').remove(); toast('Ads cleared'); } } }] })),
   music: ctx => page(ctx, null, settings(ctx, { path: 'musicUrl', title: 'Global background music', icon: 'music_note', desc: 'Always part of the shuffle. With the Music library below, users hear ALL tracks one after another in random order.', from: v => (v && typeof v === 'object' ? v : { url: typeof v === 'string' ? v : '' }), fields: [{ key: 'url', label: 'Audio URL (mp3)', type: 'url', required: true }, { key: 'name', label: 'Track name', type: 'text' }], to: d => ({ url: d.url, name: d.name || 'Music' }), buttons: [{ label: 'Remove music', icon: 'music_off', fn: async () => { await db.ref('musicUrl').remove(); toast('Music removed'); } }] }), crud(ctx, { path: 'customMusicList', push: true, title: 'Music library', icon: 'library_music', singular: 'track', search: ['name'], fields: [{ key: 'name', label: 'Name', type: 'text', required: true }, { key: 'url', label: 'Audio URL', type: 'url', required: true }], row: i => ({ title: i.name, sub: i.url, icon: 'music_note' }), actions: [{ icon: 'play_circle', label: 'Set as global music', fn: async i => { await db.ref('musicUrl').set({ url: i.url, name: i.name }); toast('Global music set: ' + i.name); } }] })),
@@ -1024,12 +1159,12 @@ function vSupport(ctx) {
   const list = () => {
     const L = $('#cl', el); const a = Object.entries(S.chats).filter(([id, c]) => !q || String(c.username || userName(id)).toLowerCase().includes(q)).sort((x, y) => num(y[1].lastUpdate) - num(x[1].lastUpdate));
     L.innerHTML = a.length ? '' : `<div class="empty">${ico('forum')}${S.loaded.chats ? 'No conversations yet.' : 'Loading…'}</div>`;
-    a.forEach(([id, c]) => { const u = S.uMap[id]; const r = h(`<div class="ci ${cur === id ? 'on' : ''}">${avatarHtml(u || { username: c.username })}<div class="mid"><b><span>${esc(c.username || userName(id))}</span><em>${c.lastUpdate ? esc(fmtShort(c.lastUpdate)) : ''}</em></b><small>${esc(c.lastMessage || '')}</small></div>${num(c.unreadAdmin) > 0 ? `<span class="badge" style="background:var(--accent);color:#fff">${num(c.unreadAdmin)}</span>` : ''}</div>`); r.onclick = () => open(id); L.appendChild(r); });
+    a.forEach(([id, c]) => { const u = S.uMap[id]; const r = h(`<div class="ci ${cur === id ? 'on' : ''}">${avatarHtml(u || { username: c.username, _k: id })}<div class="mid"><b><span>${esc(c.username || userName(id))}</span><em>${c.lastUpdate ? esc(fmtShort(c.lastUpdate)) : ''}</em></b><small>${esc(c.lastMessage || '')}</small></div>${num(c.unreadAdmin) > 0 ? `<span class="badge" style="background:var(--accent);color:#fff">${num(c.unreadAdmin)}</span>` : ''}</div>`); r.onclick = () => open(id); L.appendChild(r); });
   };
   function open(id) {
     cur = id; if (mOff) mOff(); const c = S.chats[id] || {}, u = S.uMap[id]; $('#ch', el).classList.add('open'); list();
     const P = $('#cp', el);
-    P.innerHTML = `<div class="ch"><button class="act back" id="bk">${ico('arrow_back')}</button>${avatarHtml(u || { username: c.username })}<div class="mid"><b>${esc(c.username || userName(id))}</b><small>UID ${esc(id)}</small></div><button class="act" id="ui" title="User details">${ico('person')}</button><button class="act del" id="cc" title="Clear chat">${ico('delete_sweep')}</button></div><div class="msgs" id="ms"></div><div class="edbar" id="eb" hidden><span id="ebT"></span><button class="act" id="ebX">${ico('close')}</button></div><div class="cin"><input id="ci" placeholder="Type a reply…" autocomplete="off"><button class="btn" id="cs2">${ico('send')}</button></div>`;
+    P.innerHTML = `<div class="ch"><button class="act back" id="bk">${ico('arrow_back')}</button>${avatarHtml(u || { username: c.username, _k: id })}<div class="mid"><b>${esc(c.username || userName(id))}</b><small>UID ${esc(id)}</small></div><button class="act" id="ui" title="User details">${ico('person')}</button><button class="act del" id="cc" title="Clear chat">${ico('delete_sweep')}</button></div><div class="msgs" id="ms"></div><div class="edbar" id="eb" hidden><span id="ebT"></span><button class="act" id="ebX">${ico('close')}</button></div><div class="cin"><input id="ci" placeholder="Type a reply…" autocomplete="off"><button class="btn" id="cs2">${ico('send')}</button></div>`;
     $('#bk', P).onclick = () => { cur = null; $('#ch', el).classList.remove('open'); list(); };
     $('#ui', P).onclick = () => S.uMap[id] ? openUser(id) : toast('User no longer exists', 'bad');
     $('#cc', P).onclick = async () => { if (await ask({ title: 'Clear this conversation?', msg: 'All messages will be deleted for both sides.', ok: 'Clear', danger: true })) { await db.ref('supportChats/' + id).remove(); cur = null; $('#ch', el).classList.remove('open'); $('#cp', el).innerHTML = ''; toast('Chat cleared'); } };
@@ -1220,9 +1355,10 @@ function imageCard(ctx, o) {
     <div class="fld" style="margin-top:16px"><label>Or use an image link</label><div class="ir" style="display:flex;gap:8px;align-items:center"><input type="text" class="iu" placeholder="https://…/image.png" style="flex:1;min-width:0"></div></div>
     <input type="file" class="if" accept="image/*" hidden></section>`);
   const q = s => $(s, c), prev = q('.ip'); let del;
-  const show = v => { const ok = typeof v === 'string' && (v.startsWith('data:image/') || /^https:\/\//.test(v)); prev.innerHTML = ok ? `<img src="${esc(v)}" alt="" style="width:100%;height:100%;object-fit:${o.crop ? 'cover' : 'contain'}">` : o.fallback; if (del) del.style.display = ok ? '' : 'none'; if (ok && /^https:/.test(v)) q('.iu').value = v; };
+  const show = v => { const ok = typeof v === 'string' && (v.startsWith('data:image/') || /^https:\/\//.test(v));
+    if (ok && o.crop) { prev.innerHTML = ''; prev.style.background = `#1b1f3a center / cover no-repeat url("${v.replace(/"/g, '%22')}")`; } else if (ok) { prev.style.background = 'var(--soft)'; prev.innerHTML = `<img src="${esc(v)}" alt="" style="width:100%;height:100%;object-fit:contain">`; } else { prev.style.background = 'var(--grad)'; prev.innerHTML = o.fallback; } if (del) del.style.display = ok ? '' : 'none'; if (ok && /^https:/.test(v)) q('.iu').value = v; };
   const toImg = file => new Promise((res, rej) => { const fr = new FileReader(); fr.onerror = rej; fr.onload = () => { const im = new Image(); im.onerror = rej; im.onload = () => { let out = '';
-      if (o.crop) { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const k = Math.max(256 / im.width, 256 / im.height), w = im.width * k, hh = im.height * k; cv.getContext('2d').drawImage(im, (256 - w) / 2, (256 - hh) / 2, w, hh); out = cv.toDataURL('image/jpeg', .88); }
+      if (o.crop) { const cv = document.createElement('canvas'); cv.width = cv.height = 256; const k = Math.max(256 / im.width, 256 / im.height), w = im.width * k, hh = im.height * k; cv.getContext('2d').drawImage(im, (256 - w) / 2, hh > w ? (256 - hh) * .22 : (256 - hh) / 2, w, hh); out = cv.toDataURL('image/jpeg', .9); }
       else { for (const sz of [256, 192, 144, 112]) { const k = Math.min(1, sz / Math.max(im.width, im.height)), cv = document.createElement('canvas'); cv.width = Math.max(1, Math.round(im.width * k)); cv.height = Math.max(1, Math.round(im.height * k)); cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height); out = cv.toDataURL('image/png'); if (out.length <= 90000) break; const w = cv.toDataURL('image/webp', .85); if (w.startsWith('data:image/webp') && w.length <= 90000) { out = w; break; } } }
       out.length > 160000 ? rej(new Error('too big')) : res(out); }; im.src = fr.result; }; fr.readAsDataURL(file); });
   const bt = q('.ib');
@@ -1245,7 +1381,9 @@ function applyAdminLogo(v) {
   let ic = document.querySelector('link[rel="icon"][data-app]'); if (ok) { if (!ic) { ic = document.createElement('link'); ic.rel = 'icon'; ic.setAttribute('data-app', '1'); document.head.appendChild(ic); } ic.href = v; } else if (ic) ic.remove();
   try { ok ? localStorage.setItem('ewi_adminlogo', v) : localStorage.removeItem('ewi_adminlogo'); } catch (e) { }
 }
-function setMeAvatar(v) { const el = $('#meAv'); if (!el || !S.me) return; const ok = typeof v === 'string' && (v.startsWith('data:image/') || /^https:\/\//.test(v)); el.innerHTML = ok ? `<img src="${esc(v)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">` : esc(initial(S.me.email)); }
+function setMeAvatar(v) { const el = $('#meAv'); if (!el || !S.me) return; const ok = typeof v === 'string' && (v.startsWith('data:image/') || /^https:\/\//.test(v));
+  if (ok) { el.textContent = ''; el.style.background = `#1b1f3a center / cover no-repeat url("${v.replace(/"/g, '%22')}")`; el.style.boxShadow = '0 0 0 2px rgba(255,255,255,.16)'; }
+  else { el.textContent = initial(S.me.email); el.style.background = ''; el.style.boxShadow = ''; } }
 let _idOffs = [];
 function wireAdminIdentity() {
   _idOffs.forEach(f => f()); _idOffs = [];
@@ -1261,6 +1399,35 @@ function vSettings(ctx) {
   el.appendChild(adminLogoCard(ctx));
   el.appendChild(photoCard(ctx));
   el.appendChild(settings(ctx, { path: 'appSettings/adminName', raw: true, from: v => ({ value: (typeof v === 'string' && v.trim()) ? v : ($('#brandName') ? $('#brandName').textContent : 'Admin') }), title: 'Admin panel name', icon: 'admin_panel_settings', desc: 'The name shown at the top of this admin panel (side menu). Only you see it — it does not change the user app.', fields: [{ key: 'value', label: 'Admin panel name', type: 'text', required: true, maxlen: 40 }] }));
+  el.appendChild(settings(ctx, { path: 'appSettings', merge: true, title: 'Photo gallery sources (API keys)', icon: 'photo_library', buttons: [{ label: 'Test Google key', cls: 'ghost', icon: 'bolt', fn: async get => { let d; try { d = get(); } catch (e) { return toast(e.message, 'bad'); } const k = String(d.googleKey || '').trim(), cx = String(d.googleCx || '').trim(); if (!k || !cx) return toast('Enter both the Google API key and the Search Engine ID first', 'bad'); try { const r = await fetch('https://www.googleapis.com/customsearch/v1?key=' + encodeURIComponent(k) + '&cx=' + encodeURIComponent(cx) + '&searchType=image&num=1&q=nature'); const j = await r.json(); if (j.error) return toast('Google says: ' + j.error.message, 'bad'); const ok = !!(j.items && j.items.length); toast(ok ? 'Google works ✓ Images will show in the gallery after you Save' : 'Key works but no images came back. Turn ON “Image search” in your Search Engine settings', ok ? 'ok' : 'bad'); } catch (e) { toast('Could not reach Google: ' + (e.message || e), 'bad'); } } }], desc: 'GOOGLE SETUP: (1) console.cloud.google.com → enable “Custom Search API” → Credentials → Create API key. (2) programmablesearchengine.google.com → create a search engine, turn ON “Search the entire web” and “Image search”, copy the Search Engine ID (cx). (3) Paste both below, tap “Test Google key”, then Save. Google free limit is 100 searches/day. Optional. Paste free API keys to show photos from these sites in the profile-photo and cover-banner gallery. All sources you fill in are shown TOGETHER, mixed in one list (Google, Pexels, Pixabay, Unsplash and your own sources below). Leave all empty to use the built-in free gallery.', fields: [
+    { key: 'googleKey', label: 'Google API key (Custom Search)', type: 'text', placeholder: 'AIza…', half: true }, { key: 'googleCx', label: 'Google Search Engine ID (cx)', type: 'text', placeholder: 'Engine ID with Image search ON', half: true },
+    { key: 'pexelsKey', label: 'Pexels API key (pexels.com/api)', type: 'text', half: true }, { key: 'pixabayKey', label: 'Pixabay API key (pixabay.com/api/docs)', type: 'text', half: true },
+    { key: 'unsplashKey', label: 'Unsplash Access Key (unsplash.com/developers)', type: 'text', half: true }],
+    to: d => { const t = k => String(d[k] || '').trim() || null; if (/^\d{6,12}-[0-9a-f]{20,32}$/i.test(String(d.pexelsKey || '').trim())) toast('That key looks like a Pixabay key. It will work, but please put it in the Pixabay box.', 'bad'); return { googleKey: t('googleKey'), googleCx: t('googleCx'), pexelsKey: t('pexelsKey'), pixabayKey: t('pixabayKey'), unsplashKey: t('unsplashKey') }; } }));
+  el.appendChild(crud(ctx, { path: 'appSettings/galleryApis', push: true, title: 'More photo sources (any API)', icon: 'add_photo_alternate', singular: 'source', search: ['name'],
+    desc: 'Add ANY other image-search API. In the URL use {q} for the search word, {page} for the page number (starts at 1) and {key} for the key. Example (Pexels style): URL https://api.pexels.com/v1/search?query={q}&page={page}&per_page=24 · Header name Authorization · Key = your key · Items path photos · Thumbnail path src.medium · Full image path src.large. The URL must start with https://',
+    fields: [{ key: 'name', label: 'Source name', type: 'text', required: true, half: true }, { key: 'key', label: 'API key (optional)', type: 'text', half: true },
+      { key: 'url', label: 'Search URL', type: 'text', required: true, placeholder: 'https://example.com/api?q={q}&page={page}&key={key}' },
+      { key: 'keyHeader', label: 'Key header name (optional)', type: 'text', placeholder: 'Authorization', half: true }, { key: 'itemsPath', label: 'Items path in response', type: 'text', placeholder: 'photos  (empty if response is a list)', half: true },
+      { key: 'thumbPath', label: 'Thumbnail path', type: 'text', placeholder: 'src.medium', half: true }, { key: 'fullPath', label: 'Full image path', type: 'text', placeholder: 'src.large', half: true }],
+    prepare: d => { if (!/^https:\/\//i.test(String(d.url || '').trim())) { toast('URL must start with https://', 'bad'); return false; } d.url = d.url.trim(); return d; },
+    row: i => ({ title: i.name, sub: i.url, icon: 'image_search' }) }));
+  el.appendChild(crud(ctx, { path: 'appSettings/galleryPhotos', push: true, title: 'Gallery photos (your own links)', icon: 'collections', singular: 'photo', search: ['name', 'url'], defaults: { kind: 'profile' },
+    desc: 'Add profile photos and cover banners by image link. They appear at the top of the gallery for every user, together with the photos from the sources above. Use a direct image link (it should open as just the picture) starting with https://',
+    fields: [{ key: 'kind', label: 'Show as', type: 'select', options: [['profile', 'Profile photo'], ['cover', 'Cover banner'], ['both', 'Both']], half: true }, { key: 'name', label: 'Name / keyword (optional)', type: 'text', half: true }, { key: 'url', label: 'Image link', type: 'url', required: true, preview: true }],
+    prepare: d => { d.url = String(d.url || '').trim(); if (!/^https:\/\//i.test(d.url)) { toast('Image link must start with https://', 'bad'); return false; } return d; },
+    row: i => ({ title: (i.name || 'Photo') + ' · ' + (i.kind === 'cover' ? 'Cover banner' : i.kind === 'both' ? 'Profile + Cover' : 'Profile photo'), sub: i.url, thumb: i.url, icon: 'image' }) }));
+  const bulk = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('playlist_add')} Add many photo links at once</h3><p>Paste one image link per line, choose where they should show, then tap Add all.</p></div></div><div data-bf></div><div data-bb style="margin-top:12px"></div></section>`);
+  const bf = buildForm([{ key: 'kind', label: 'Add as', type: 'select', options: [['profile', 'Profile photos'], ['cover', 'Cover banners'], ['both', 'Both']], half: true }, { key: 'urls', label: 'Image links (one per line)', type: 'textarea', rows: 6, required: true }], { kind: 'profile' });
+  $('[data-bf]', bulk).appendChild(bf.el);
+  $('[data-bb]', bulk).appendChild(btn('Add all', '', async () => {
+    let d; try { d = bf.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
+    const links = [...new Set(String(d.urls || '').split(/\s+/).map(x => x.trim()).filter(x => /^https:\/\/\S+$/i.test(x)))];
+    if (!links.length) return toast('No valid https:// links found', 'bad');
+    const ref = db.ref('appSettings/galleryPhotos'); for (const u of links) await ref.push({ url: u, kind: d.kind || 'profile', name: '' });
+    $$('textarea', bf.el).forEach(t => t.value = ''); toast(links.length + ' photo' + (links.length > 1 ? 's' : '') + ' added');
+  }, 'playlist_add'));
+  el.appendChild(bulk);
   el.appendChild(settings(ctx, { path: 'appSettings', merge: true, title: 'Maintenance mode', icon: 'construction', desc: 'When on, users see your message instead of the app.', fields: [{ key: 'maintenance', label: 'Status', type: 'switch', text: 'Put the app in maintenance mode' }, { key: 'maintenanceMessage', label: 'Message', type: 'textarea', rows: 3, default: 'We are making improvements. Please check back soon.' }] }));
   // appearance
   const ap = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('palette')} Appearance</h3><p>Switch between light and dark mode.</p></div></div></section>`); ap.appendChild(btn('Toggle theme', 'ghost', () => toggleTheme(), 'contrast')); el.appendChild(ap);
@@ -1305,7 +1472,7 @@ function changeMyPw() {
 
 /* ====================== NAV + ROUTER ====================== */
 /* ---- Earn feature visibility (stored in appSettings/earnHide/<id> = true when hidden) ---- */
-const EARN_FEATS = [['checkin', 'Daily check-in', 'event_available', 'daily'], ['spin', 'Spin wheel', 'casino', 'spin'], ['task', 'Tasks', 'assignment', 'tasks'], ['quiz', 'Quiz', 'quiz', 'quiz'], ['video', 'Watch & Earn (videos)', 'smart_display', 'videos'], ['scratch', 'Scratch cards', 'blur_on', 'scratch'], ['ttt', 'Tic Tac Toe', 'grid_on', 'ttt'], ['captcha', 'Captcha', 'security', 'captcha'], ['offers', 'Offers', 'local_offer', 'offers'], ['surveys', 'Surveys', 'poll', 'surveys']];
+const EARN_FEATS = [['checkin', 'Daily check-in', 'event_available', 'daily'], ['spin', 'Spin wheel', 'casino', 'spin'], ['task', 'Tasks', 'assignment', 'tasks'], ['quiz', 'Quiz', 'quiz', 'quiz'], ['video', 'Watch & Earn (videos)', 'smart_display', 'videos'], ['scratch', 'Scratch cards', 'blur_on', 'scratch'], ['puzzle', 'Brain Road (Puzzle)', 'extension', 'puzzle'], ['ttt', 'Tic Tac Toe', 'grid_on', 'ttt'], ['rps', 'Rock Paper Scissors', 'pan_tool', 'rps'], ['captcha', 'Captcha', 'security', 'captcha'], ['watchads', 'Watch Ads (AdMob)', 'ads_click', 'watchads'], ['offers', 'Offers', 'local_offer', 'offers'], ['surveys', 'Surveys', 'poll', 'surveys']];
 const EARN_ROUTE = {}; EARN_FEATS.forEach(f => EARN_ROUTE[f[3]] = f);
 function earnSwitch(ctx, f, compact) {
   const id = 'es_' + f[0] + (compact ? '_c' : '');
@@ -1324,7 +1491,7 @@ function flagCard(ctx, o) {
   cb.addEventListener('change', async () => { const on = cb.checked; try { await db.ref(o.path).set(o.invert ? !on : on); toast(txt(on)); } catch (e) { cb.checked = !on; fail(e, 'Could not update'); } });
   return c;
 }
-const FEAT_ADS = { spin: 'spin', daily: 'checkin', ttt: 'ttt' };
+const FEAT_ADS = { spin: 'spin', daily: 'checkin', ttt: 'ttt', puzzle: 'puzzle', rps: 'rps' };
 const SECTION_CARDS = {
   about: [{ path: 'appSettings/hideSection/about', invert: true, icon: 'info', title: 'Visibility', desc: 'Show or hide “About” in the user’s All features list only. The ⋮ menu always keeps About. Takes effect instantly.', label: 'About in All features', onText: 'visible to users', offText: 'hidden from users' }],
   methods: [{ path: 'appSettings/hideSection/withdraw', invert: true, icon: 'payments', title: 'Withdraw in All features', desc: 'Show or hide the “Withdraw” item in the user’s All features list only. The Wallet tab and the Home Withdraw button are not affected. Takes effect instantly.', label: 'Withdraw in All features', onText: 'visible to users', offText: 'hidden from users' }],
@@ -1333,24 +1500,57 @@ const SECTION_CARDS = {
   tasks: [{ path: 'gameSettings/task/showCoin', invert: false, icon: 'paid', title: 'Reward coin', desc: 'Show or hide the reward amount (coin) on each task for users.', label: 'Reward coin', onText: 'shown to users', offText: 'hidden from users' }, { path: 'gameSettings/task/allowSkip', invert: false, icon: 'skip_next', title: 'Skip button', desc: 'Let users skip a task they do not want to answer.', label: 'Skip button', onText: 'shown to users', offText: 'hidden from users' }],
   quiz: [{ path: 'gameSettings/quiz/showCoin', invert: false, icon: 'paid', title: 'Reward coin', desc: 'Show or hide the reward amount (coin) on each question for users.', label: 'Reward coin', onText: 'shown to users', offText: 'hidden from users' }, { path: 'gameSettings/quiz/allowSkip', invert: false, icon: 'skip_next', title: 'Skip button', desc: 'Let users skip a question they do not want to answer.', label: 'Skip button', onText: 'shown to users', offText: 'hidden from users' }]
 };
+const ACT_KINDS = [['any', 'Any earning activity'], ['task', 'Tasks'], ['quiz', 'Quiz questions'], ['video', 'Watch & Earn videos'], ['spin', 'Spins'], ['scratch', 'Scratch cards'], ['puzzle', 'Brain Road puzzles'], ['ttt', 'Tic Tac Toe wins'], ['rps', 'Rock Paper Scissors wins'], ['captcha', 'Captchas'], ['watchads', 'Ads watched'], ['offer', 'Offers'], ['survey', 'Surveys'], ['checkin', 'Daily check-ins']];
+const ACT_RXA = { task: /^Task Completed/i, quiz: /^Quiz Completed/i, video: /^Watched video/i, spin: /^Spin/i, scratch: /^Scratch/i, ttt: /^Tic Tac Toe/i, puzzle: /^Brain Road/i, rps: /^Rock Paper Scissors/i, watchads: /^Watch Ads/i, captcha: /^Captcha/i, offer: /^Offer:/i, survey: /^Survey:/i, checkin: /^Daily Check/i };
+const ACT_LBL = { any: 'activities', task: 'tasks', quiz: 'quizzes', video: 'videos', spin: 'spins', scratch: 'scratch cards', ttt: 'Tic Tac Toe wins', puzzle: 'Brain Road puzzles', rps: 'Rock Paper Scissors wins', watchads: 'ads watched', captcha: 'captchas', offer: 'offers', survey: 'surveys', checkin: 'daily check-ins' };
+const WD_TYPES = { visit: 'Stay on a website for N minutes (counted live)', referrals: 'Invite N friends (counted live)', activity: 'Complete N activities (counted live)', earned: 'Earn a total amount (counted live)', days: 'Account age in days (counted live)', profile: 'Complete the profile (checked automatically)', link: 'Open a link / follow / join', rule: 'Read & accept a rule' };
+const WD_ICON = { visit: 'timer', referrals: 'group_add', activity: 'task_alt', earned: 'paid', days: 'event', profile: 'person', link: 'open_in_new', rule: 'gavel' };
+function actCountA(uid, u, kind) { const st = num((u.stats || {})[kind]); const tx = (S.tx || []).filter(x => x.type === 'earn' && String(x.userId) === String(uid) && (kind === 'any' ? Object.values(ACT_RXA).some(r => r.test(String(x.description || ''))) : ACT_RXA[kind] && ACT_RXA[kind].test(String(x.description || '')))).length; return Math.max(st, tx); }
+/* live progress of one user on one step (same rules as the user app) */
+function wdProgress(uid, u, x) {
+  const tg = num(x.target), k = x._k, W = u.wdSteps || {}, bar = (n, lab) => ({ done: n >= tg, label: lab, pct: tg ? Math.min(100, n / tg * 100) : 100 });
+  if (x.verify === 'review' && ['link', 'visit', 'rule'].includes(x.type)) { const ap = (u.wdApproved || {})[k] === true, pend = !ap && W[k] === 'pending', rej = !ap && !pend && (u.wdRejected || {})[k] === true; const mins = (x.type === 'visit' && tg > 0) ? ' · ' + (Math.round(num((u.wdTime || {})[k]) / 6) / 10) + ' / ' + tg + ' min on the website' : ''; return { done: ap, pending: pend, review: true, label: (ap ? 'Approved by admin' : pend ? 'Waiting for your approval' : rej ? 'Rejected — user can resubmit' : 'Not submitted yet') + mins }; }
+  switch (x.type) {
+    case 'earned': return bar(num(u.totalEarned), money(u.totalEarned) + ' / ' + money(tg) + ' earned');
+    case 'days': { const d = u.createdAt ? Math.max(0, Math.floor((Date.now() - new Date(u.createdAt).getTime()) / 864e5)) : 0; return bar(d, d + ' / ' + tg + ' days old'); }
+    case 'referrals': { const n = vals(u.referrals).length; return bar(n, n + ' / ' + tg + ' friends invited'); }
+    case 'activity': { const kd = x.kind || 'any', n = actCountA(uid, u, kd); return bar(n, n + ' / ' + tg + ' ' + (ACT_LBL[kd] || 'activities')); }
+    case 'visit': { const sec = num((u.wdTime || {})[k]); return { done: sec >= tg * 60, label: (Math.round(sec / 6) / 10) + ' / ' + tg + ' minutes on the website', pct: tg ? Math.min(100, sec / (tg * 60) * 100) : 100 }; }
+    case 'profile': { const ok = !!(u.bio && (u.work || u.study || u.hobby)); return { done: ok, label: ok ? 'Profile complete' : 'Profile not complete', pct: ok ? 100 : 0 }; }
+    case 'link': if (x.verify === 'review') { const ap = (u.wdApproved || {})[k] === true, pend = !ap && W[k] === 'pending', rej = !ap && !pend && (u.wdRejected || {})[k] === true; return { done: ap, pending: pend, review: true, label: ap ? 'Approved by admin' : pend ? 'Waiting for your approval' : rej ? 'Rejected — user can resubmit' : 'Not submitted yet' }; }
+    default: return { done: W[k] === true, label: W[k] === true ? 'Confirmed by the user' : 'Not done yet' };
+  }
+}
+async function wdDecide(uid, k, ok) { try { await db.ref('users/' + uid).update(ok ? { ['wdApproved/' + k]: true, ['wdSteps/' + k]: true, ['wdRejected/' + k]: null } : { ['wdApproved/' + k]: null, ['wdSteps/' + k]: null, ['wdRejected/' + k]: true }); toast(ok ? 'Approved — step completed for the user' : 'Rejected — the user can try again'); } catch (e) { fail(e, 'Could not save'); } }
 VIEWS.wdgate = ctx => {
-  const TY = { link: 'Open a link (follow / join / visit)', rule: 'Read & accept a rule', earned: 'Earn a total amount', days: 'Account age (days)' };
   const sw = flagCard(ctx, { path: 'appSettings/withdrawGate/enabled', invert: false, defOff: true, icon: 'verified_user', title: 'Require activation before withdrawing', desc: 'When ON, a user must complete every visible step below before they can request a withdrawal. When OFF, everyone can withdraw as usual. Turn it on or off whenever you like.', label: 'Withdraw activation', onText: 'ON — users must complete the steps', offText: 'OFF — everyone can withdraw' });
   const sh = flagCard(ctx, { path: 'appSettings/withdrawGate/hidden', invert: true, icon: 'visibility', title: 'Show in the app', desc: 'Show or hide the “Withdraw Activation” item in the user’s All features list. (If activation is ON, users still see the lock notice in their Wallet.)', label: 'Show in All features', onText: 'visible to users', offText: 'hidden from users' });
   const txt = settings(ctx, { path: 'appSettings/withdrawGate', merge: true, title: 'Text shown to users', icon: 'edit_note', desc: 'Optional. Leave empty to use the defaults.', fields: [{ key: 'title', label: 'Title', type: 'text', maxlen: 60, placeholder: 'Activate your withdrawal' }, { key: 'message', label: 'Message', type: 'textarea', rows: 3, placeholder: 'Complete the steps below to unlock withdrawals.' }] });
-  const steps = crud(ctx, { path: 'appSettings/withdrawSteps', push: true, title: 'Activation steps', icon: 'checklist', singular: 'step', search: ['title'], stamp: 'iso', defaults: { type: 'link', waitSec: 10, enabled: true },
-    desc: 'Add the rules / tasks users must complete. Every visible step must be done.',
-    fields: [{ key: 'title', label: 'Step title', type: 'text', required: true, maxlen: 80, placeholder: 'e.g. Join our Telegram channel' },
-      { key: 'type', label: 'Step type', type: 'select', options: Object.entries(TY), default: 'link' },
+  /* approvals waiting */
+  let stepsNow = []; const q = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('how_to_reg')} Waiting for your approval</h3><p>Users who finished a link step that needs your check. Look at it, then approve or reject.</p></div><span class="badge" id="wqn">0</span></div><div class="list" id="wq"></div></section>`);
+  const drawQ = () => { const L = $('#wq', q); L.innerHTML = ''; let n = 0; const rv = stepsNow.filter(x => x.verify === 'review' && ['link', 'visit', 'rule'].includes(x.type));
+    Object.entries(S.uMap || {}).forEach(([uid, u]) => rv.forEach(x => { if (!u || ((u.wdSteps || {})[x._k] !== 'pending')) return; n++;
+      const r = h(`<div class="row"><div class="av">${esc(initial(u.username || '?'))}</div><div class="mid"><b>${esc(u.username || ('User ' + uid))}</b><small>${esc(x.title)}${x.type === 'visit' && num(x.target) > 0 ? ' · ' + (Math.round(num((u.wdTime || {})[x._k]) / 6) / 10) + ' / ' + num(x.target) + ' min on the website' : ''}${x.url ? ' · ' + esc(x.url) : ''}</small></div><div class="acts"></div></div>`);
+      const ok = btn('Approve', 'sm', () => wdDecide(uid, x._k, true), 'check'), no = btn('Reject', 'ghost sm', () => wdDecide(uid, x._k, false), 'close'); $('.acts', r).append(ok, no); L.appendChild(r); }));
+    $('#wqn', q).textContent = n; if (!n) L.innerHTML = '<div class="empty">Nothing is waiting for approval.</div>'; };
+  ctx.sub('users', drawQ);
+  const steps = crud(ctx, { path: 'appSettings/withdrawSteps', push: true, title: 'Activation steps', icon: 'checklist', singular: 'step', search: ['title'], stamp: 'iso', defaults: { type: 'visit', waitSec: 10, enabled: true, kind: 'any', verify: 'none' },
+    desc: 'Add the rules / tasks users must complete. Numbers are counted live from what the user really does — they cannot just tap “done”.',
+    fields: [{ key: 'title', label: 'Step title', type: 'text', required: true, maxlen: 80, placeholder: 'e.g. Invite 20 friends' },
+      { key: 'type', label: 'Step type', type: 'select', options: Object.entries(WD_TYPES), default: 'visit' },
       { key: 'description', label: 'Instruction / rule text', type: 'textarea', rows: 3, placeholder: 'What the user has to do' },
-      { key: 'url', label: 'Link (for “Open a link”)', type: 'url', placeholder: 'https://…' },
-      { key: 'waitSec', label: 'Seconds before “I’ve done it” unlocks (link steps)', type: 'number', min: 0, default: 10, half: true },
-      { key: 'target', label: 'Target (৳ for “Earn a total amount”, days for “Account age”)', type: 'number', min: 0, half: true },
+      { key: 'target', label: 'Target (minutes the user must stay on the website · friends for invites · count for activities · ৳ for earnings · days for account age)', type: 'number', min: 0 },
+      { key: 'kind', label: 'Which activity? (for “Complete N activities”)', type: 'select', options: ACT_KINDS, default: 'any' },
+      { key: 'url', label: 'Website / link (for visit and link steps)', type: 'url', placeholder: 'https://…' },
+      { key: 'verify', label: 'Admin approval (link, website and rule steps)', type: 'select', options: [['none', 'No — automatic / user confirms'], ['review', 'Yes — admin approves each user']], default: 'none', hint: 'Choose “Yes” and the user taps “Send for approval”. You then approve or reject them in “Waiting for your approval” above.' },
+      { key: 'waitSec', label: 'Countdown for link steps (seconds)', type: 'number', min: 0, default: 10, half: true, hint: 'The user sees a live countdown after tapping “Open”. For website steps the countdown uses the Target minutes above.' },
       { key: 'enabled', label: 'Visibility', type: 'switch', text: 'This step is active', default: true }],
-    prepare: d => { if (d.type === 'link' && !d.url) { toast('Enter the link for this step', 'bad'); return null; } if ((d.type === 'earned' || d.type === 'days') && !(num(d.target) > 0)) { toast('Enter the target amount / days', 'bad'); return null; } return d; },
-    row: i => ({ title: i.title, sub: (TY[i.type] || 'Step') + (i.type === 'link' && i.url ? ' · ' + i.url : '') + ((i.type === 'earned' || i.type === 'days') && i.target ? ' · ' + i.target : ''), icon: { link: 'open_in_new', rule: 'gavel', earned: 'paid', days: 'event' }[i.type] || 'task_alt', badge: [i.enabled === false ? 'hidden' : 'active', i.enabled === false ? '' : 'ok'] }),
+    prepare: d => { const review = d.verify === 'review' && ['link', 'visit', 'rule'].includes(d.type), needsUrl = d.type === 'visit' || d.type === 'link', needsTarget = ['visit', 'referrals', 'activity', 'earned', 'days'].includes(d.type);
+      if (needsUrl && !d.url) { toast('Enter the website / link for this step', 'bad'); return null; } if (needsTarget && !(num(d.target) > 0)) { toast('Enter the target number for this step', 'bad'); return null; } return d; },
+    row: i => ({ title: i.title, sub: (WD_TYPES[i.type] || 'Step').replace(/ \(.*\)$/, '') + (i.target && i.type !== 'link' && i.type !== 'rule' && i.type !== 'profile' ? ' · target ' + i.target : '') + (i.type === 'activity' ? ' · ' + (ACT_LBL[i.kind || 'any'] || '') : '') + (i.verify === 'review' && ['link', 'visit', 'rule'].includes(i.type) ? ' · admin approves' : ''), icon: WD_ICON[i.type] || 'task_alt', badge: [i.enabled === false ? 'hidden' : 'active', i.enabled === false ? '' : 'ok'] }),
     actions: [{ icon: 'visibility', label: 'Turn on / off', fn: async i => { try { await db.ref('appSettings/withdrawSteps/' + i._k).update({ enabled: i.enabled === false }); toast(i.enabled === false ? 'Step is now active' : 'Step turned off'); } catch (e) { fail(e, 'Could not update'); } } }] });
-  page(ctx, 'Users must finish the steps you add here before they can withdraw. Switch the whole requirement on or off at any time.', sw, sh, txt, steps);
+  ctx.listen('appSettings/withdrawSteps', s => { stepsNow = []; s.forEach(c => { const v = c.val(); if (v) stepsNow.push(Object.assign({ _k: c.key }, v)); }); drawQ(); });
+  page(ctx, 'Users must finish the steps you add here before they can withdraw. Switch the whole requirement on or off at any time.', sw, sh, txt, q, steps);
 };
 const ytIdOf = u => { u = String(u || '').trim(); const m = /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/))([\w-]{11})/.exec(u); return m ? m[1] : (/^[\w-]{11}$/.test(u) ? u : ''); };
 VIEWS.tutorial = ctx => {
@@ -1364,25 +1564,174 @@ VIEWS.tutorial = ctx => {
     actions: [{ icon: 'visibility', label: 'Show / hide', fn: async i => { try { await db.ref('appSettings/tutorials/' + i._k).update({ enabled: i.enabled === false }); toast(i.enabled === false ? 'Now visible to users' : 'Hidden from users'); } catch (e) { fail(e, 'Could not update'); } } }] });
   page(ctx, 'A Tutorial section for your users, with YouTube videos you choose. Control where it appears below.', a1, a2, list);
 };
+
+/* ====================== FEEDBACK ====================== */
+const FB_LBL = { suggestion: 'Suggestion', problem: 'Problem', complaint: 'Complaint', praise: 'Praise' };
+VIEWS.feedback = ctx => {
+  const a1 = flagCard(ctx, { path: 'appSettings/hideSection/feedback', invert: true, icon: 'apps', title: 'Show in All features', desc: 'Show or hide “Feedback” in the user’s All features list (shown just before About).', label: 'Feedback in All features', onText: 'visible to users', offText: 'hidden from users' });
+  const a2 = flagCard(ctx, { path: 'appSettings/hideSection/feedbackMenu', invert: true, icon: 'more_vert', title: 'Show in the ⋮ menu', desc: 'Show or hide “Feedback” in the user’s top-right ⋮ menu (shown just before About).', label: 'Feedback in ⋮ menu', onText: 'visible to users', offText: 'hidden from users' });
+  const root = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('rate_review')} User feedback <span class="badge brand" data-n>0</span></h3><p>Messages sent by users. Reply to a message and the user sees your reply in their Feedback page.</p></div><div class="blk-a"><div class="search">${ico('search')}<input type="text" placeholder="Search…"></div><select class="fbf" style="padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--soft);color:inherit"><option value="all">All</option><option value="new">New</option><option value="replied">Replied</option><option value="low">Low rating (1–2★)</option></select></div></div><div class="list" data-list><div class="sk" style="height:60px"></div></div></section>`);
+  let items = [], loaded = false, q = '', fl = 'all';
+  const stars = n => n ? '★'.repeat(n) + '☆'.repeat(5 - n) : '';
+  const draw = () => {
+    const L = $('[data-list]', root); $('[data-n]', root).textContent = items.length; if (!loaded) return;
+    const f = items.filter(i => (!q || [i.username, i.message, i.reply, i.uid].some(v => String(v || '').toLowerCase().includes(q))) && (fl === 'all' || (fl === 'new' && !i.reply) || (fl === 'replied' && i.reply) || (fl === 'low' && i.rating > 0 && i.rating <= 2)));
+    if (!f.length) { L.innerHTML = `<div class="empty">${ico('rate_review')}${items.length ? 'No matches.' : 'No feedback yet.'}</div>`; return; }
+    L.innerHTML = '';
+    f.forEach(it => {
+      const row = h(`<div class="row"><div class="thumb">${ico(it.reply ? 'mark_chat_read' : 'mark_chat_unread')}</div><div class="mid"><b>${esc(it.username || userName(it.uid))} <span style="color:#ffb300;font-weight:400">${esc(stars(+it.rating || 0))}</span></b><small>${esc(it.message || '')}</small></div><span class="badge ${it.reply ? 'ok' : ''}">${it.reply ? 'replied' : 'new'}</span><div class="acts"></div></div>`);
+      const A = $('.acts', row);
+      const v = h(`<button class="act" title="Open / reply">${ico('reply')}</button>`); v.onclick = () => open(it);
+      const d = h(`<button class="act del" title="Delete">${ico('delete')}</button>`);
+      d.onclick = async () => { if (await ask({ title: 'Delete this feedback?', msg: (it.message || '').slice(0, 80), ok: 'Delete', danger: true })) db.ref('feedback/' + it.uid + '/' + it._k).remove().then(() => toast('Deleted')).catch(e => fail(e)); };
+      row.querySelector('.mid').style.cursor = 'pointer'; row.querySelector('.mid').onclick = () => open(it);
+      A.append(v, d); L.appendChild(row);
+    });
+  };
+  function open(it) {
+    const body = h(`<div><div class="muted" style="font-size:12px;margin-bottom:8px">${esc(FB_LBL[it.type] || 'Feedback')} · ${esc(fmtDate(it.date))} · UID ${esc(it.uid)}${it.rating ? ' · ' + esc(stars(+it.rating)) : ''}</div><div style="white-space:pre-wrap;word-break:break-word;padding:12px;border-radius:14px;background:var(--soft);margin-bottom:14px">${esc(it.message || '')}</div><div class="fld"><label>Your reply</label><textarea rows="5" maxlength="500" placeholder="Write a reply to the user…">${esc(it.reply || '')}</textarea></div></div>`);
+    const ta = $('textarea', body);
+    const sv = btn('Save reply', '', async () => { const r = ta.value.trim(); try { await db.ref('feedback/' + it.uid + '/' + it._k).update(r ? { reply: r, repliedAt: new Date().toISOString(), status: 'replied' } : { reply: null, repliedAt: null, status: 'new' }); toast(r ? 'Reply sent' : 'Reply removed'); sh.close(); } catch (e) { fail(e, 'Could not save reply'); } }, 'check');
+    const sh = openSheet({ title: 'Feedback from ' + (it.username || userName(it.uid)), body, footer: [btn('Close', 'ghost', () => sh.close()), sv] });
+  }
+  ctx.listen('feedback', s => { items = []; s.forEach(u => u.forEach(c => { const v = c.val(); if (v && typeof v === 'object') items.push(Object.assign({ _k: c.key, uid: v.uid || u.key }, v)); })); items.sort((a, b) => new Date(b.date) - new Date(a.date)); loaded = true; draw(); });
+  $('.search input', root).oninput = e => { q = e.target.value.trim().toLowerCase(); draw(); };
+  $('.fbf', root).onchange = e => { fl = e.target.value; draw(); };
+  page(ctx, 'Collect feedback from users. Control where the Feedback button appears below.', a1, a2, root);
+};
+/* ====================== VIP (2x / 3x / 4x earning boost) ====================== */
+SECTION_CARDS.vip = [{ path: 'appSettings/hideSection/vip', invert: true, icon: 'visibility', title: 'Show VIP in the app', desc: 'Show or hide “VIP” in the user’s All features list. Takes effect instantly.', label: 'VIP in All features', onText: 'visible to users', offText: 'hidden from users' }];
+const vipActive = u => u && u.vip && num(u.vip.multiplier) > 1 && (!num(u.vip.expiresAt) || num(u.vip.expiresAt) > now());
+async function vipActivate(uid, o, oid) {
+  const n = now(), d = num(o.days);
+  await db.ref('users/' + uid + '/vip').transaction(c => {
+    const act = c && (!num(c.expiresAt) || num(c.expiresAt) > n), same = act && c.planId === o.planId;
+    const exp = (d === 0 || (same && !num(c.expiresAt))) ? 0 : (same ? num(c.expiresAt) : n) + d * 864e5;
+    return clean({ planId: o.planId || '', planName: o.planName || '', multiplier: num(o.multiplier), startedAt: same ? c.startedAt : n, expiresAt: exp, orderId: oid || '' });
+  });
+}
+async function vipDecide(o, status, note) {
+  const r = await db.ref('vipOrders/' + o._k + '/status').transaction(c => ((c || 'pending') === 'pending' ? status : undefined));
+  if (!r.committed) { toast('Already processed', 'bad'); return false; }
+  if (status === 'approved') await vipActivate(String(o.userId), o, o._k);
+  await db.ref('vipOrders/' + o._k).update({ note: note || '', processedAt: new Date().toISOString() });
+  toast('Order ' + status); return true;
+}
+async function vipGrant() {
+  const snap = await db.ref('vipPlans').once('value'), plans = [];
+  snap.forEach(c => { const v = c.val(); if (v) plans.push(Object.assign({ _k: c.key }, v)); });
+  if (!plans.length) return toast('Add a VIP plan first', 'bad');
+  const form = buildForm([{ key: 'uid', label: 'User UID or username', type: 'text', required: true }, { key: 'plan', label: 'VIP plan', type: 'select', options: plans.map(p => [p._k, p.name + ' · ' + num(p.multiplier) + 'x']) }]);
+  const sh = openSheet({ title: 'Give VIP manually', body: form.el, footer: [btn('Cancel', 'ghost', () => sh.close()), btn('Give VIP', '', async () => {
+    let d; try { d = form.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
+    const u = S.uMap[d.uid] || S.users.find(x => String(x.username || '').toLowerCase() === d.uid.toLowerCase());
+    if (!u) return toast('User not found', 'bad');
+    const p = plans.find(x => x._k === d.plan);
+    await vipActivate(String(u._k), { planId: p._k, planName: p.name, multiplier: num(p.multiplier), days: num(p.days) }, 'admin');
+    toast('VIP given to ' + u.username); sh.close();
+  }, 'workspace_premium')] });
+}
+VIEWS.vip = ctx => {
+  const on = flagCard(ctx, { path: 'vipSettings/enabled', invert: false, icon: 'workspace_premium', title: 'VIP system (ON / OFF)', desc: 'Master switch. OFF = no multiplier for anyone and users cannot buy VIP. Users keep their remaining VIP time (it is not extended).', label: 'VIP system', onText: 'ON — multipliers and purchases are active', offText: 'OFF — VIP is disabled for everyone' });
+  const cfg = settings(ctx, { path: 'vipSettings', merge: true, title: 'Payment mode & texts', icon: 'bolt', desc: 'Auto mode needs the “Received payments” list (VIP → Payment methods). If a TrxID is not found, the order simply waits for your approval.',
+    fields: [{ key: 'autoMode', label: 'Payment approval', type: 'select', options: [['manual', 'Manual — I approve every payment'], ['verify', 'Auto — activate when the TrxID matches a received payment']], default: 'manual' },
+      { key: 'title', label: 'Heading shown to users', type: 'text', maxlen: 60, placeholder: 'Earn 2x, 3x or 4x more' }, { key: 'message', label: 'Message shown to users', type: 'textarea', rows: 3, placeholder: 'Buy a VIP plan and every coin you earn is multiplied.' }] });
+  const plans = crud(ctx, { path: 'vipPlans', push: true, title: 'VIP plans', icon: 'workspace_premium', singular: 'VIP plan', search: ['name'], stamp: 'iso', defaults: { multiplier: 2, price: 100, days: 30, enabled: true },
+    desc: 'Add as many VIP plans as you like. Every coin the user earns is multiplied by the plan’s multiplier (2 = 2x, 3 = 3x, 4 = 4x).',
+    fields: [{ key: 'name', label: 'Plan name', type: 'text', required: true, maxlen: 40, placeholder: 'e.g. Gold VIP' }, { key: 'multiplier', label: 'Multiplier (2 = 2x, 3 = 3x, 4 = 4x)', type: 'number', required: true, min: 1.1, half: true },
+      { key: 'price', label: 'Price (৳) — 0 = free', type: 'number', min: 0, default: 0, half: true }, { key: 'days', label: 'Duration (days) — 0 = unlimited', type: 'number', int: true, min: 0, default: 30, half: true },
+      { key: 'description', label: 'Short description (optional)', type: 'textarea', rows: 2 }, { key: 'enabled', label: 'Visibility', type: 'switch', text: 'Show this plan to users', default: true }],
+    row: i => ({ title: i.name, sub: num(i.multiplier) + 'x · ' + (num(i.price) > 0 ? money(i.price) : 'Free') + ' · ' + (num(i.days) > 0 ? num(i.days) + ' days' : 'unlimited'), icon: 'workspace_premium', badge: [i.enabled === false ? 'hidden' : 'visible', i.enabled === false ? '' : 'ok'] }),
+    actions: [{ icon: 'visibility', label: 'Show / hide', fn: async i => { try { await db.ref('vipPlans/' + i._k).update({ enabled: i.enabled === false }); toast(i.enabled === false ? 'Plan visible to users' : 'Plan hidden'); } catch (e) { fail(e, 'Could not update'); } } }] });
+  page(ctx, 'Sell VIP plans that multiply what users earn. Switch the whole system or single plans on / off at any time.', on, cfg, plans);
+};
+function vipPool(ctx) {
+  const MB = { B: ['bKash', '#e2136e'], N: ['Nagad', '#f6921e'], R: ['Rocket', '#8c3494'] };
+  const mBadge = t => { const m = MB[String(t || '').toUpperCase()] || [t || 'Other', '#64748b']; return `<span class="badge" style="background:${m[1]};color:#fff">${esc(m[0])}</span>`; };
+  const key = s => String(s || '').replace(/[.#$\[\]\/]/g, '_');
+  const wrap = h(`<div style="display:grid;gap:16px"></div>`);
+  const c = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('inbox')} Received payments (for Auto mode) <span class="badge brand" id="vpN">0</span></h3><p>Every payment you receive goes here (node <b>XNXANIKPAY</b>). Your SMS-forwarder can push it automatically (see VIP_SETUP.md) or add it by hand below. When a user enters the same TrxID, VIP starts automatically and the payment moves to “Auto Pay history”.</p></div></div><div id="vpF"></div><div id="vpB" style="margin:18px 0 6px"></div><div class="list" id="vpL" style="margin-top:14px"></div></section>`);
+  const hist = h(`<section class="card block"><div class="blk-h"><div><h3>${ico('smart_toy')} Auto Pay history <span class="badge brand" id="vhN">0</span></h3><p>All VIP payments that were verified and activated automatically.</p></div></div><div class="list" id="vhL"></div></section>`);
+  wrap.append(c, hist);
+  const form = buildForm([{ key: 'txid', label: 'TrxID', type: 'text', required: true },
+    { key: 'type', label: 'Method', type: 'select', options: [['B', 'bKash'], ['N', 'Nagad'], ['R', 'Rocket'], ['O', 'Other / Bank']], half: true },
+    { key: 'amount', label: 'Amount (৳)', type: 'number', required: true, min: 1, half: true },
+    { key: 'agent', label: 'Agent / received on (optional)', type: 'text' }], { type: 'B' });
+  $('#vpF', c).appendChild(form.el);
+  let pool = [], used = {};
+  $('#vpB', c).appendChild(btn('Add payment', '', async () => {
+    let d; try { d = form.get(); } catch (e) { if (e instanceof VErr) return toast(e.message, 'bad'); throw e; }
+    const t = String(d.txid).trim(); if (t.length < 6 || /\s/.test(t)) return toast('Invalid TrxID', 'bad');
+    if (pool.some(p => String(p.txid).toLowerCase() === t.toLowerCase())) return toast('This TrxID is already in the list', 'bad');
+    try { await db.ref('XNXANIKPAY').push(clean({ txid: t, amount: d.amount, type: d.type, agent: d.agent, timestamp: Date.now() })); toast('Payment added'); form.el.querySelectorAll('input').forEach(i => { if (i.type !== 'hidden') i.value = ''; }); } catch (e) { fail(e, 'Could not add payment'); }
+  }, 'add'));
+  const draw = () => {
+    $('#vpN', c).textContent = pool.length;
+    const L = $('#vpL', c); L.innerHTML = pool.length ? '' : `<div class="empty">${ico('inbox')}No received payments yet.</div>`;
+    pool.slice(0, 60).forEach(p => {
+      const u = used[key(p.txid)];
+      const r = h(`<div class="row vrow"><div class="thumb">${ico('payments')}</div><div class="mid"><b>${esc(p.txid)} · ${money(p.amount)}</b><small>${p.agent ? esc(p.agent) + ' · ' : ''}${p.timestamp ? esc(new Date(num(p.timestamp)).toLocaleString()) : ''}${u ? ' · used by ' + esc(u.usedBy_email || u.usedBy_uid || '') : ''}</small></div>${mBadge(p.type)}<span class="badge ${u ? 'ok' : 'warn'}">${u ? 'used' : 'unused'}</span><div class="acts"></div></div>`);
+      const d = h(`<button class="act del" title="Delete">${ico('delete')}</button>`); d.onclick = async () => { if (await ask({ title: 'Delete this payment?', msg: p.txid, ok: 'Delete', danger: true })) db.ref('XNXANIKPAY/' + p._k).remove(); };
+      $('.acts', r).appendChild(d); L.appendChild(r);
+    });
+    const hs = Object.values(used).filter(x => x && x.orderId).sort((a, b) => num(b.timestamp) - num(a.timestamp)); $('#vhN', hist).textContent = hs.length;
+    const H = $('#vhL', hist); H.innerHTML = hs.length ? '' : `<div class="empty">${ico('smart_toy')}No auto payments yet.</div>`;
+    hs.slice(0, 60).forEach(x => H.appendChild(h(`<div class="row vrow"><div class="thumb">${ico('smart_toy')}</div><div class="mid"><b>${esc(x.usedBy_email || 'N/A')} · ${money(x.amount)}</b><small>UID ${esc(x.usedBy_uid || '')} · ${esc(x.txid)} · ${x.planName ? esc(x.planName) + ' · ' : ''}${x.timestamp ? esc(new Date(num(x.timestamp)).toLocaleString()) : ''}</small></div>${mBadge(x.type)}</div>`)));
+  };
+  ctx.listen('XNXANIKPAY', s => { pool = []; s.forEach(x => { const v = x.val(); if (v && typeof v === 'object' && v.txid) pool.push(Object.assign({ _k: x.key }, v)); }); pool.sort((a, b) => num(b.timestamp) - num(a.timestamp)); draw(); });
+  ctx.listen('Auto Pay', s => { used = s.val() || {}; draw(); });
+  return wrap;
+}
+VIEWS.vippay = ctx => page(ctx, null,
+  crud(ctx, { path: 'vipPayMethods', title: 'VIP payment methods', icon: 'payments', singular: 'method', search: ['name', 'number'], defaults: { type: 'mobile', icon: 'payments', enabled: true },
+    fields: [{ key: 'name', label: 'Method name', type: 'text', required: true, placeholder: 'bKash, Nagad, Rocket, Bank…' }, { key: 'type', label: 'Type', type: 'select', options: [['mobile', 'Mobile wallet (number)'], ['bank', 'Bank account (details)']], half: true }, { key: 'icon', label: 'Material icon name', type: 'text', default: 'payments', half: true },
+      { key: 'number', label: 'Number / account number users send money to', type: 'text', required: true }, { key: 'accountType', label: 'Account type (Personal / Agent / Merchant)', type: 'text', half: true }, { key: 'holder', label: 'Account name / bank & branch (optional)', type: 'text', half: true },
+      { key: 'instruction', label: 'Instruction for users (optional)', type: 'textarea', rows: 2, placeholder: 'e.g. Use “Send Money”' }, { key: 'enabled', label: 'Visibility', type: 'switch', text: 'Show this method to users', default: true }],
+    row: i => ({ title: i.name, sub: (i.type === 'bank' ? 'Bank transfer' : 'Mobile payment') + ' · ' + (i.number || ''), icon: i.icon || 'payments', badge: [i.enabled === false ? 'hidden' : (i.type || 'mobile'), i.enabled === false ? '' : 'brand'] }) }),
+  vipPool(ctx));
+VIEWS.viporders = ctx => {
+  const el = ctx.el; let tab = 'pending';
+  el.innerHTML = `<section class="card"><div class="blk-h"><h3>${ico('receipt_long')} VIP orders</h3><div class="blk-a" id="voB"></div></div><div class="tabs" id="voT"></div><div class="list" id="voL">${skeleton(3)}</div></section><section class="card block" style="margin-top:16px"><div class="blk-h"><h3>${ico('workspace_premium')} Active VIP members <span class="badge brand" id="vmN">0</span></h3></div><div class="list" id="vmL"></div></section>`;
+  $('#voB', el).appendChild(btn('Give VIP manually', 'ghost sm', vipGrant, 'person_add'));
+  const st = o => o.status || 'pending';
+  const draw = () => {
+    if (!S.loaded.vo) return; const all = S.vo || [];
+    $('#voT', el).innerHTML = ['pending', 'approved', 'rejected', 'all'].map(s => `<button class="tab ${tab === s ? 'on' : ''}" data-t="${s}">${s[0].toUpperCase() + s.slice(1)}<em>${all.filter(o => s === 'all' || st(o) === s).length}</em></button>`).join('');
+    $$('[data-t]', el).forEach(b => b.onclick = () => { tab = b.dataset.t; draw(); });
+    const a = all.filter(o => tab === 'all' || st(o) === tab), L = $('#voL', el); L.innerHTML = a.length ? '' : `<div class="empty">${ico('receipt_long')}Nothing here.</div>`;
+    a.slice(0, 100).forEach(o => {
+      const r = h(`<div class="row vrow"><div class="thumb">${ico('workspace_premium')}</div><div class="mid"><b>${esc(o.username || userName(o.userId))} · ${esc(o.planName)} ${num(o.multiplier)}x · ${money(o.price)}</b><small>${esc(o.methodName || '')} · from ${esc(o.sender || '—')} · TrxID ${esc(o.trxId || '—')} · ${esc(fmtShort(o.date))}${o.auto ? ' · auto' : ''}${o.autoNote ? ' · auto check: ' + esc(o.autoNote) : ''}${o.note ? ' · ' + esc(o.note) : ''}</small></div>${statusBadge(st(o))}<div class="acts"></div></div>`);
+      if (st(o) === 'pending') $('.acts', r).append(
+        btn('Approve', 'sm', async () => { if (await ask({ title: 'Approve payment?', msg: 'Check ' + (o.methodName || '') + ' TrxID ' + (o.trxId || '') + ' for ' + money(o.price) + ' first.', ok: 'Approve' })) await vipDecide(o, 'approved', ''); }, 'check'),
+        btn('Reject', 'ghost sm', async () => { const n = await ask({ title: 'Reject this order?', msg: '', ok: 'Reject', danger: true, input: true, placeholder: 'Reason (optional)' }); if (n !== null) await vipDecide(o, 'rejected', n); }, 'close'));
+      L.appendChild(r);
+    });
+    const ms = S.users.filter(vipActive); $('#vmN', el).textContent = ms.length; const M = $('#vmL', el); M.innerHTML = ms.length ? '' : `<div class="empty">${ico('workspace_premium')}No active VIP members.</div>`;
+    ms.forEach(u => { const e = num(u.vip.expiresAt), r = h(`<div class="row vrow"><div class="av">${esc(initial(u.username))}</div><div class="mid"><b>${esc(u.username)} · ${num(u.vip.multiplier)}x</b><small>${esc(u.vip.planName || '')} · ${e ? 'until ' + esc(fmtDate(e)) : 'unlimited'}</small></div><div class="acts"></div></div>`);
+      $('.acts', r).appendChild(btn('Remove', 'ghost sm', async () => { if (await ask({ title: 'Remove VIP from ' + u.username + '?', ok: 'Remove', danger: true })) { await db.ref('users/' + u._k + '/vip').remove(); toast('VIP removed'); } }, 'close')); M.appendChild(r); });
+  };
+  ctx.sub('vo', draw); ctx.sub('users', draw); draw();
+};
 const NAV = [
   ['Overview', [['dashboard', 'Dashboard', 'space_dashboard'], ['users', 'Users', 'people'], ['withdrawals', 'Withdrawals', 'account_balance_wallet'], ['transactions', 'Transactions', 'receipt_long']]],
-  ['Earn features', [['tasks', 'Tasks', 'assignment'], ['quiz', 'Quiz', 'quiz'], ['spin', 'Spin wheel', 'casino'], ['videos', 'Videos', 'smart_display'], ['scratch', 'Scratch cards', 'blur_on'], ['ttt', 'Tic Tac Toe', 'grid_on'], ['captcha', 'Captcha', 'security'], ['offers', 'Offers', 'local_offer'], ['surveys', 'Surveys', 'poll'], ['daily', 'Daily bonus', 'event_available']]],
+  ['Earn features', [['tasks', 'Tasks', 'assignment'], ['quiz', 'Quiz', 'quiz'], ['spin', 'Spin wheel', 'casino'], ['videos', 'Videos', 'smart_display'], ['scratch', 'Scratch cards', 'blur_on'], ['puzzle', 'Brain Road (Puzzle)', 'extension'], ['ttt', 'Tic Tac Toe', 'grid_on'], ['rps', 'Rock Paper Scissors', 'pan_tool'], ['captcha', 'Captcha', 'security'], ['watchads', 'Watch Ads (AdMob)', 'ads_click'], ['offers', 'Offers', 'local_offer'], ['surveys', 'Surveys', 'poll'], ['daily', 'Daily bonus', 'event_available']]],
   ['Growth', [['signup', 'Signup bonus', 'person_add'], ['referral', 'Referrals', 'group_add']]],
   ['Content', [['banners', 'Home banners', 'view_carousel'], ['popups', 'Popups', 'crop_free'], ['notifications', 'Notifications', 'notifications'], ['notices', 'Notice board', 'campaign'], ['social', 'Social links', 'share'], ['tutorial', 'Tutorial videos', 'school'], ['features', 'Custom features', 'widgets'], ['widgets', 'Admin widgets', 'dashboard_customize'], ['ads', 'Ads code', 'ads_click'], ['music', 'Music', 'music_note'], ['about', 'About us', 'info'], ['owner', 'About owner', 'badge'], ['developer', 'Developer info', 'code']]],
   ['Money', [['methods', 'Withdraw methods', 'payments'], ['wdgate', 'Withdraw activation', 'verified_user']]],
-  ['Support', [['support', 'Live chat', 'support_agent'], ['ai', 'AI support', 'smart_toy']]],
+  ['VIP', [['vip', 'VIP plans', 'workspace_premium'], ['vippay', 'VIP payment methods', 'account_balance'], ['viporders', 'VIP orders', 'receipt_long']]],
+  ['Support', [['support', 'Live chat', 'support_agent'], ['feedback', 'Feedback', 'rate_review'], ['ai', 'AI support', 'smart_toy']]],
   ['System', [['settings', 'Settings', 'settings']]]
 ];
 const TITLES = {}; NAV.forEach(g => g[1].forEach(i => TITLES[i[0]] = i[1]));
 function buildNav() {
-  $('#nav').innerHTML = NAV.map(g => `<h6>${g[0]}</h6>` + g[1].map(i => `<a href="#/${i[0]}" data-r="${i[0]}">${ico(i[2])}<span>${i[1]}</span>${i[0] === 'withdrawals' || i[0] === 'support' ? `<span class="bdg" id="bd_${i[0]}" hidden></span>` : ''}</a>`).join('')).join('');
+  $('#nav').innerHTML = NAV.map(g => `<h6>${g[0]}</h6>` + g[1].map(i => `<a href="#/${i[0]}" data-r="${i[0]}">${ico(i[2])}<span>${i[1]}</span>${i[0] === 'withdrawals' || i[0] === 'support' || i[0] === 'viporders' ? `<span class="bdg" id="bd_${i[0]}" hidden></span>` : ''}</a>`).join('')).join('');
   $$('#nav a').forEach(a => a.onclick = () => closeMenu());
 }
 function updBadges() {
   const p = S.wd.filter(w => wdSt(w) === 'pending').length, u = Object.values(S.chats).reduce((a, c) => a + num(c.unreadAdmin), 0);
-  [['withdrawals', p], ['support', u]].forEach(([k, n]) => { const b = $('#bd_' + k); if (b) { b.hidden = !n; b.textContent = n > 99 ? '99+' : n; } });
+  [['withdrawals', p], ['support', u], ['viporders', (S.vo || []).filter(o => (o.status || 'pending') === 'pending').length]].forEach(([k, n]) => { const b = $('#bd_' + k); if (b) { b.hidden = !n; b.textContent = n > 99 ? '99+' : n; } });
 }
-bus.on('wd', updBadges); bus.on('chats', updBadges);
+bus.on('wd', updBadges); bus.on('chats', updBadges); bus.on('vo', updBadges);
 function route() {
   if (!S.me) return; killView();
   let id = (location.hash.replace(/^#\/?/, '') || 'dashboard').split('?')[0]; if (!VIEWS[id]) id = 'dashboard';
@@ -1399,7 +1748,7 @@ $('#logoutBtn').onclick = logout;
 function toggleTheme() { const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', t); try { localStorage.setItem('ewi_admin_theme', t); } catch (e) { } $('#themeBtn').innerHTML = ico(t === 'dark' ? 'light_mode' : 'dark_mode'); }
 $('#themeBtn').innerHTML = ico(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light_mode' : 'dark_mode'); $('#themeBtn').onclick = toggleTheme;
 window.addEventListener('unhandledrejection', e => { console.error(e.reason); });
-if (db) { let an = null, un = null; const applyBrand = () => { const n = (typeof an === 'string' && an.trim()) ? an : (typeof un === 'string' && un.trim()) ? un : 'Admin'; $('#brandName').textContent = n; };
+if (db) { let an = null, un = null; const applyBrand = () => { const n = (typeof an === 'string' && an.trim()) ? an : (typeof un === 'string' && un.trim()) ? un : 'Admin'; $('#brandName').textContent = n; try { localStorage.setItem('ewi_adminname', n); } catch (e) { } };
   db.ref('appSettings/adminName').on('value', s => { an = s.val(); applyBrand(); }, () => { });   /* own name for the admin panel; until you set it, the user app name is used as before */
   db.ref('appName').on('value', s => { un = s.val(); applyBrand(); }, () => { }); }
 boot();
